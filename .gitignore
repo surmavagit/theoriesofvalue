@@ -2,3 +2,4 @@ ignored
 public
 authors.go
 theoriesofvalue
+.env

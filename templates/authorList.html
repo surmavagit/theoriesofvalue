@@ -3,18 +3,18 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="{{ domain }}/styles.css">
 
         <title>Authors | Theories of Value</title>
     </head>
     <body>
         <header>
             <a href="#main">SKIP TO MAIN CONTENT</a>
-            <a href="https://theoriesofvalue.com">Theories of Value</a>
+            <a href="{{ domain }}{{ index }}">Theories of Value</a>
             <a href="https://github.com/surmavagit/theoriesofvalue">Github</a>
             <nav>
                 <ul>
-                    <li><a href="https://theoriesofvalue.com/authors">Authors</a></li>
+                    <li><a href="{{ domain }}/authors{{ index }}">Authors</a></li>
                 </ul>
             </nav>
         </header>
@@ -22,11 +22,13 @@
             <h1>Authors</h1>
             <ul>
                 {{ range . }}
-                <li><a href="https://theoriesofvalue.com/authors/{{ .Slug }}">{{ .Name }}</a></li>
+                <li><a href="{{ domain }}/authors/{{ .Slug }}{{ index }}">{{ .Name }}</a></li>
                 {{ end }}
             </ul>
         </main>
         <footer>
+            <a href="https://github.com/surmavagit/theoriesofvalue">Github</a>
+            <p>theoriesofvalue.com, since 2024</p>
         </footer>
     </body>
 </html>
