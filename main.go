@@ -21,16 +21,26 @@ func main() {
 		check(err)
 	}
 
+	funcMap := template.FuncMap{"domain": getDomain, "index": switchIndex}
+
+    // generate main page
+	indexTmpl := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles(templatesDir + "/index.html"))
+	idx, err := os.Create(strings.Join([]string{outputDir, "index.html"}, "/"))
+	check(err)
+	err = indexTmpl.Execute(idx, nil)
+    check(err)
+
+    // generate authors list
+	authorListTmpl := template.Must(template.New("authorList.html").Funcs(funcMap).ParseFiles(templatesDir + "/authorList.html"))
 	err = os.Mkdir(outputDir+"/"+authorsDir, 0744)
 	check(err)
-
-	authorListTmpl := template.Must(template.ParseFiles(templatesDir + "/authorList.html"))
 	al, err := os.Create(strings.Join([]string{outputDir, authorsDir, "index.html"}, "/"))
 	check(err)
 	err = authorListTmpl.Execute(al, data)
 	check(err)
 
-	authorTmpl := template.Must(template.ParseFiles(templatesDir + "/author.html"))
+    // generate author pages
+	authorTmpl := template.Must(template.New("author.html").Funcs(funcMap).ParseFiles(templatesDir + "/author.html"))
 	for _, a := range data {
 		err = os.Mkdir(strings.Join([]string{outputDir, authorsDir, a.Slug}, "/"), 0744)
 		check(err)
@@ -38,8 +48,26 @@ func main() {
 		check(err)
 		err = authorTmpl.Execute(f, a)
 		check(err)
-		fmt.Println(a.Slug)
 	}
+}
+
+func relativeUrls() bool {
+	args := os.Args
+	return len(args) == 2 && args[1] == "-d"
+}
+
+func getDomain() template.URL {
+	if relativeUrls() {
+		return template.URL(getEnv("LOCALPATH"))
+	}
+	return template.URL("https://theoriesofvalue.com")
+}
+
+func switchIndex() template.URL {
+	if relativeUrls() {
+		return template.URL("/index.html")
+	}
+	return ""
 }
 
 func check(err error) {

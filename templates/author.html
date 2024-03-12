@@ -3,18 +3,18 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="{{ domain }}/styles.css">
 
         <title>{{ .Name }} | Theories of Value</title>
     </head>
     <body>
         <header>
             <a href="#main">SKIP TO MAIN CONTENT</a>
-            <a href="https://theoriesofvalue.com">Theories of Value</a>
+            <a href="{{ domain }}{{ index }}">Theories of Value</a>
             <a href="https://github.com/surmavagit/theoriesofvalue">Github</a>
             <nav>
                 <ul>
-                    <li><a href="https://theoriesofvalue.com/authors">Authors</a></li>
+                    <li><a href="{{ domain }}/authors{{ index }}">Authors</a></li>
                 </ul>
             </nav>
         </header>
@@ -31,7 +31,7 @@
                 <dd><a href="https://{{ .Wikipedia.Code }}.wikipedia.org/wiki/{{ .Wikipedia.Name }}">{{ .Wikipedia.Code }}.wikipedia.org/wiki/{{ .Wikipedia.Name }}</a></dd>
                 {{ if not .OnlineBooks }}{{ else }}
                 <dt>OnlineBooksPage:</dt>
-                <dd><a href="{{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
+                <dd><a href="https://onlinebooks.library.upenn.edu/webbin/book/lookupname?key={{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
                 {{ end }}
             </dl>
             <section>
@@ -44,6 +44,8 @@
             </section>
         </main>
         <footer>
+            <a href="https://github.com/surmavagit/theoriesofvalue">Github</a>
+            <p>theoriesofvalue.com, since 2024</p>
         </footer>
     </body>
 </html>
