@@ -23,14 +23,14 @@ func main() {
 
 	funcMap := template.FuncMap{"domain": getDomain, "index": switchIndex}
 
-    // generate main page
+	// generate main page
 	indexTmpl := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles(templatesDir + "/index.html"))
 	idx, err := os.Create(strings.Join([]string{outputDir, "index.html"}, "/"))
 	check(err)
 	err = indexTmpl.Execute(idx, nil)
-    check(err)
+	check(err)
 
-    // generate authors list
+	// generate authors list
 	authorListTmpl := template.Must(template.New("authorList.html").Funcs(funcMap).ParseFiles(templatesDir + "/authorList.html"))
 	err = os.Mkdir(outputDir+"/"+authorsDir, 0744)
 	check(err)
@@ -39,7 +39,7 @@ func main() {
 	err = authorListTmpl.Execute(al, data)
 	check(err)
 
-    // generate author pages
+	// generate author pages
 	authorTmpl := template.Must(template.New("author.html").Funcs(funcMap).ParseFiles(templatesDir + "/author.html"))
 	for _, a := range data {
 		err = os.Mkdir(strings.Join([]string{outputDir, authorsDir, a.Slug}, "/"), 0744)
