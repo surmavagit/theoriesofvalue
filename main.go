@@ -32,7 +32,7 @@ func main() {
 
 	// generate authors list
 	authorListTmpl := template.Must(template.New("authorList.html").Funcs(funcMap).ParseFiles(templatesDir + "/authorList.html"))
-	err = os.Mkdir(outputDir+"/"+authorsDir, 0744)
+	err = os.Mkdir(outputDir+"/"+authorsDir, 0755)
 	check(err)
 	al, err := os.Create(strings.Join([]string{outputDir, authorsDir, "index.html"}, "/"))
 	check(err)
@@ -42,7 +42,7 @@ func main() {
 	// generate author pages
 	authorTmpl := template.Must(template.New("author.html").Funcs(funcMap).ParseFiles(templatesDir + "/author.html"))
 	for _, a := range data {
-		err = os.Mkdir(strings.Join([]string{outputDir, authorsDir, a.Slug}, "/"), 0744)
+		err = os.Mkdir(strings.Join([]string{outputDir, authorsDir, a.Slug}, "/"), 0755)
 		check(err)
 		f, err := os.Create(strings.Join([]string{outputDir, authorsDir, a.Slug, "index.html"}, "/"))
 		check(err)
@@ -67,7 +67,7 @@ func switchIndex() template.URL {
 	if relativeUrls() {
 		return template.URL("/index.html")
 	}
-	return ""
+	return template.URL("/")
 }
 
 func check(err error) {
