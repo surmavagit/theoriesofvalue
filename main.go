@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"os"
@@ -21,7 +22,7 @@ func main() {
 		check(err)
 	}
 
-	funcMap := template.FuncMap{"domain": getDomain, "index": switchIndex}
+	funcMap := template.FuncMap{"domain": getDomain, "index": switchIndex, "header": header, "footer": footer}
 
 	// generate main page
 	indexTmpl := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles(templatesDir + "/index.html"))
@@ -68,6 +69,21 @@ func switchIndex() template.URL {
 		return template.URL("/index.html")
 	}
 	return template.URL("/")
+}
+
+func header(title string) template.HTML {
+	funcMap := template.FuncMap{"domain": getDomain, "index": switchIndex}
+	hdrTmpl := template.Must(template.New("header.tmpl").Funcs(funcMap).ParseFiles(templatesDir + "/header.tmpl"))
+	bfr := bytes.Buffer{}
+	err := hdrTmpl.Execute(&bfr, title)
+	check(err)
+	return template.HTML(bfr.String())
+}
+
+func footer() template.HTML {
+	ftr, err := os.ReadFile(strings.Join([]string{templatesDir, "footer.tmpl"}, "/"))
+	check(err)
+	return template.HTML(ftr)
 }
 
 func check(err error) {
