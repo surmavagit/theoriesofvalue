@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"slices"
 	"strings"
 )
 
 var outputDir = "public"
 var staticDir = "static"
 var authorsDir = "authors"
+var worksDir = "works"
 var templatesDir = "templates"
 
 func main() {
@@ -50,6 +52,36 @@ func main() {
 		err = authorTmpl.Execute(f, a)
 		check(err)
 	}
+
+	// generate works list
+	workListTmpl := template.Must(template.New("workList.tmpl").Funcs(funcMap).ParseFiles(templatesDir + "/workList.tmpl"))
+	err = os.Mkdir(outputDir+"/"+worksDir, 0755)
+	check(err)
+	wl, err := os.Create(strings.Join([]string{outputDir, worksDir, "index.html"}, "/"))
+	check(err)
+
+	works := []work{}
+	for _, a := range data {
+		for _, w := range a.Works {
+			w.Author = a.Name
+			works = append(works, w)
+		}
+	}
+
+	slices.SortStableFunc(works, cmp)
+	err = workListTmpl.Execute(wl, works)
+	check(err)
+
+}
+
+func cmp(a work, b work) int {
+	if a.Publication > b.Publication {
+		return 1
+	}
+	if a.Publication < b.Publication {
+		return -1
+	}
+	return 0
 }
 
 func relativeUrls() bool {
