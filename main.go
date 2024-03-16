@@ -25,14 +25,14 @@ func main() {
 	funcMap := template.FuncMap{"domain": getDomain, "index": switchIndex, "header": header, "footer": footer}
 
 	// generate main page
-	indexTmpl := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles(templatesDir + "/index.html"))
+	indexTmpl := template.Must(template.New("index.tmpl").Funcs(funcMap).ParseFiles(templatesDir + "/index.tmpl"))
 	idx, err := os.Create(strings.Join([]string{outputDir, "index.html"}, "/"))
 	check(err)
 	err = indexTmpl.Execute(idx, nil)
 	check(err)
 
 	// generate authors list
-	authorListTmpl := template.Must(template.New("authorList.html").Funcs(funcMap).ParseFiles(templatesDir + "/authorList.html"))
+	authorListTmpl := template.Must(template.New("authorList.tmpl").Funcs(funcMap).ParseFiles(templatesDir + "/authorList.tmpl"))
 	err = os.Mkdir(outputDir+"/"+authorsDir, 0755)
 	check(err)
 	al, err := os.Create(strings.Join([]string{outputDir, authorsDir, "index.html"}, "/"))
@@ -41,7 +41,7 @@ func main() {
 	check(err)
 
 	// generate author pages
-	authorTmpl := template.Must(template.New("author.html").Funcs(funcMap).ParseFiles(templatesDir + "/author.html"))
+	authorTmpl := template.Must(template.New("author.tmpl").Funcs(funcMap).ParseFiles(templatesDir + "/author.tmpl"))
 	for _, a := range data {
 		err = os.Mkdir(strings.Join([]string{outputDir, authorsDir, a.Slug}, "/"), 0755)
 		check(err)
@@ -81,7 +81,7 @@ func header(title string) template.HTML {
 }
 
 func footer() template.HTML {
-	ftr, err := os.ReadFile(strings.Join([]string{templatesDir, "footer.tmpl"}, "/"))
+	ftr, err := os.ReadFile(strings.Join([]string{templatesDir, "footer.html"}, "/"))
 	check(err)
 	return template.HTML(ftr)
 }
