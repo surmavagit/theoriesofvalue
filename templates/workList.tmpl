@@ -1,0 +1,10 @@
+{{ header "Works" }}
+            <h1>Works</h1>
+            <ul>
+                {{ range . }}
+                <li>
+                    {{ .Publication }} - {{ .Author }} - {{ .Title }}
+                </li>
+                {{ end }}
+            </ul>
+{{ footer }}

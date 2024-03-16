@@ -12,12 +12,12 @@ type author struct {
 }
 
 type wikipedia struct {
-	Code     string
-	Language string
-	Name     string
+	Code string
+	Name string
 }
 
 type work struct {
+	Author      string
 	Title       string
 	Publication uint
 }
