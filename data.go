@@ -25,13 +25,17 @@ type Wikipedia struct {
 }
 
 type Work struct {
-	Slug     string
-	Page     bool
-	Authors  *string
-	Dubious  bool
-	Title    string
-	Year     *int
-	Wikidata *string
+	Slug       string
+	Page       bool
+	Year       *int
+	Authors    *string
+	Dubious    bool
+	TitleFirst *string
+	TitleMain  string
+	TitleLast  *string
+	FullTitle  string
+	Wikidata   *string
+	Wikipedia  *Wikipedia
 }
 
 func dbConnect() (*sql.DB, error) {
@@ -71,7 +75,7 @@ func getEnv(envar string) (string, error) {
 
 func getAuthorData(db *sql.DB) ([]Author, error) {
 	authorData := []Author{}
-	query := "select slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) as fullname, wikidata, onlinebooks from author right join name on author.slug = name.author where page = true order by main_part;"
+	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, wikidata, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "'WHERE page = true ORDER BY main_part;"
 	authorRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -90,9 +94,10 @@ func getAuthorData(db *sql.DB) ([]Author, error) {
 	return authorData, nil
 }
 
-func getAuthorWorks(db *sql.DB, slug string) ([]Work, error) {
+func getAuthorWorks(db *sql.DB, authorSlug string) ([]Work, error) {
 	authorWorks := []Work{}
-	query := fmt.Sprintf("select slug, page, title.main_part, (select MIN(year) as year from edition where edition.work = work.slug) from work left join title on work.slug = title.work left join attribution on work.slug = attribution.work left join name on name.author = attribution.author where name.author = '%s' order by year;", slug)
+	selectFirstEditionYear := "SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug"
+	query := "SELECT slug, page, title.main_part, (" + selectFirstEditionYear + ") FROM work LEFT JOIN title ON work.slug = title.work_slug AND title.lang = '" + siteLang + "' LEFT JOIN attribution ON work.slug = attribution.work_slug LEFT JOIN name ON name.author = attribution.author_slug AND name.lang = '" + siteLang + "' WHERE name.author = '" + authorSlug + "' ORDER BY year;"
 	workRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -101,7 +106,7 @@ func getAuthorWorks(db *sql.DB, slug string) ([]Work, error) {
 
 	for workRows.Next() {
 		a := Work{}
-		err := workRows.Scan(&a.Slug, &a.Page, &a.Title, &a.Year)
+		err := workRows.Scan(&a.Slug, &a.Page, &a.TitleMain, &a.Year)
 		if err != nil {
 			return nil, err
 		}
@@ -113,10 +118,9 @@ func getAuthorWorks(db *sql.DB, slug string) ([]Work, error) {
 
 func getWorkData(db *sql.DB) ([]Work, error) {
 	workData := []Work{}
-	selectShortTitle := " (select main_part from title where title.work = work.slug),"
-	selectFirstEditionYear := " (select min(year) as year from edition where edition.work = work.slug)"
-	selectWorkAllAuthorsTable := " (select work, string_agg((select main_part from name where name.author = attribution.author), ', ') as all_authors from attribution left join work on attribution.work = work.slug group by work)"
-	query := "select page, dubious, wikidata, work, all_authors," + selectShortTitle + selectFirstEditionYear + " from work left join" + selectWorkAllAuthorsTable + " as authors on work.slug = authors.work;"
+	selectFirstEditionYear := "SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug"
+	selectWorkAllAuthorsTable := "SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '" + siteLang + "' GROUP BY work_slug"
+	query := "SELECT authors.names, slug, dubious, wikidata, title.first_part, title.main_part, title.last_part, (" + selectFirstEditionYear + ") FROM work INNER JOIN title ON title.work_slug = work.slug AND title.lang = '" + siteLang + "' LEFT JOIN (" + selectWorkAllAuthorsTable + ") AS authors ON work.slug = authors.work_slug WHERE page = true;"
 	workRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -125,7 +129,7 @@ func getWorkData(db *sql.DB) ([]Work, error) {
 
 	for workRows.Next() {
 		w := Work{}
-		err := workRows.Scan(&w.Page, &w.Dubious, &w.Wikidata, &w.Slug, &w.Authors, &w.Title, &w.Year)
+		err := workRows.Scan(&w.Authors, &w.Slug, &w.Dubious, &w.Wikidata, &w.TitleFirst, &w.TitleMain, &w.TitleLast, &w.Year)
 		if err != nil {
 			return nil, err
 		}

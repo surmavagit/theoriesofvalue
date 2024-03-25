@@ -3,7 +3,7 @@
             <ul>
                 {{ range . }}
                 <li>
-                    {{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}{{ index }}">{{ end }}{{ .Year }} - {{ .Authors }} - {{ .Title }}{{ if .Page }}</a>{{ end }}
+                    <a href="{{ domain }}/works/{{ .Slug }}{{ index }}">{{ .Year }} - {{ .Authors }} - {{ .TitleMain }}</a>
                 </li>
                 {{ end }}
             </ul>
