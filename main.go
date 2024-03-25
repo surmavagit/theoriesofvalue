@@ -14,6 +14,7 @@ const (
 	templatesDir = "templates"
 	authorsDir   = "authors"
 	worksDir     = "works"
+	siteLang     = "eng"
 )
 
 func main() {
