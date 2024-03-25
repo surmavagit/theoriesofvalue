@@ -1,25 +1,35 @@
 {{ header .Name }}
             <h1>{{ .Name }}</h1>
             <dl>
+                {{ if not .Birth }}{{ else }}
                 <dt>Birth:</dt>
                 <dd>{{ .Birth }}</dd>
+                {{ end }}
+                {{ if not .Death }}{{ else }}
                 <dt>Death:</dt>
                 <dd>{{ .Death }}</dd>
-                <dt>Wikidata Id:</dt>
-                <dd><a href="https://wikidata.org/wiki/{{ .WikidataId }}">{{ .WikidataId }}</a></dd>
+                {{ end }}
+                {{ if not .Wikidata }}{{ else }}
+                <dt>Wikidata:</dt>
+                <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
+                {{ end }}
+                {{ if not .Wikipedia }}{{ else }}
                 <dt>Wikipedia:</dt>
                 <dd><a href="https://{{ .Wikipedia.Code }}.wikipedia.org/wiki/{{ .Wikipedia.Name }}">{{ .Wikipedia.Code }}.wikipedia.org/wiki/{{ .Wikipedia.Name }}</a></dd>
+                {{ end }}
                 {{ if not .OnlineBooks }}{{ else }}
                 <dt>OnlineBooksPage:</dt>
                 <dd><a href="https://onlinebooks.library.upenn.edu/webbin/book/lookupname?key={{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
                 {{ end }}
             </dl>
+            {{ if not .Works }}{{ else }}
             <section>
                 <h2>Works</h2>
                 <ul>
                     {{ range .Works }}
-                    <li>{{ .Publication }} {{ .Title }}</li>
+                    <li>{{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}{{ index }}">{{ end }}{{ if .Year }}{{ .Year }}{{ end }} {{ .Title }}{{ if .Page }}</a>{{ end }}</li>
                     {{ end }}
                 </ul>
             </section>
+            {{ end }}
 {{ footer }}

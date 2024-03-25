@@ -32,6 +32,28 @@ func main() {
 	}
 	defer db.Close() //panicking from now on
 
+	table, err := os.ReadFile("schema.sql")
+	if err != nil {
+		fmt.Printf("can't read file: %s", err)
+		os.Exit(1)
+	}
+	_, err = db.Exec(string(table))
+	if err != nil {
+		fmt.Printf("can't create tables: %s", err)
+		os.Exit(1)
+	}
+
+	data, err := os.ReadFile("data.sql")
+	if err != nil {
+		fmt.Printf("can't read file: %s", err)
+		os.Exit(1)
+	}
+	_, err = db.Exec(string(data))
+	if err != nil {
+		fmt.Printf("can't fill database: %s", err)
+		os.Exit(1)
+	}
+
 	// copy static files
 	staticFiles, err := os.ReadDir(staticDir)
 	if err != nil {
@@ -55,13 +77,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	authorsData, err := getAuthorData(db)
+	if err != nil {
+		panic(err)
+	}
 	err = uniquePage("authorList.tmpl", funcMap, authorsData, path(outputDir, authorsDir, "index.html"))
 	if err != nil {
 		panic(err)
 	}
 
 	// generate author pages
-	err = pageCollection("author.tmpl", funcMap, authorsMap, "authors")
+
+	for i, a := range authorsData {
+		// get data on author's works
+		works, err := getAuthorWorks(db, a.Slug)
+		if err != nil {
+			panic(err)
+		}
+		authorsData[i].Works = works
+	}
+
+	err = pageCollection("author.tmpl", funcMap, authorsData, "authors")
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +107,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = uniquePage("workList.tmpl", funcMap, worksData, path(outputDir, worksDir, "index.html"))
+	workData, err := getWorkData(db)
+	if err != nil {
+		panic(err)
+	}
+	err = uniquePage("workList.tmpl", funcMap, workData, path(outputDir, worksDir, "index.html"))
 	if err != nil {
 		panic(err)
 	}
