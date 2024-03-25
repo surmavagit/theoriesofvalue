@@ -25,6 +25,27 @@ func main() {
 		os.Exit(1)
 	}
 
+	// copy static files
+	staticFiles, err := os.ReadDir(staticDir)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	for _, sf := range staticFiles {
+		err := os.Link(path(staticDir, sf.Name()), path(outputDir, sf.Name()))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
+
+	// generate main page
+	err = uniquePage("index.tmpl", funcMap, nil, path(outputDir, "index.html"))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	// connect to db
 	db, err := dbConnect()
 	if err != nil {
@@ -33,42 +54,8 @@ func main() {
 	}
 	defer db.Close() //panicking from now on
 
-	table, err := os.ReadFile("schema.sql")
-	if err != nil {
-		fmt.Printf("can't read file: %s", err)
-		os.Exit(1)
-	}
-	_, err = db.Exec(string(table))
-	if err != nil {
-		fmt.Printf("can't create tables: %s", err)
-		os.Exit(1)
-	}
-
-	data, err := os.ReadFile("data.sql")
-	if err != nil {
-		fmt.Printf("can't read file: %s", err)
-		os.Exit(1)
-	}
-	_, err = db.Exec(string(data))
-	if err != nil {
-		fmt.Printf("can't fill database: %s", err)
-		os.Exit(1)
-	}
-
-	// copy static files
-	staticFiles, err := os.ReadDir(staticDir)
-	if err != nil {
-		panic(err)
-	}
-	for _, sf := range staticFiles {
-		err := os.Link(path(staticDir, sf.Name()), path(outputDir, sf.Name()))
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	// generate main page
-	err = uniquePage("index.tmpl", funcMap, nil, path(outputDir, "index.html"))
+	// create tables and insert data
+	err = db.Create("schema.sql", "data.sql")
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +65,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	authorsData, err := getAuthorData(db)
+	authorsData, err := db.getAuthorData()
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +78,7 @@ func main() {
 
 	for i, a := range authorsData {
 		// get data on author's works
-		works, err := getAuthorWorks(db, a.Slug)
+		works, err := db.getAuthorWorks(a.Slug)
 		if err != nil {
 			panic(err)
 		}
@@ -108,11 +95,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	workData, err := getWorkData(db)
+	workData, err := db.getWorkData()
 	if err != nil {
 		panic(err)
 	}
 	err = uniquePage("workList.tmpl", funcMap, workData, path(outputDir, worksDir, "index.html"))
+	if err != nil {
+		panic(err)
+	}
+
+	err = pageCollection("work.tmpl", funcMap, workData, "works")
 	if err != nil {
 		panic(err)
 	}

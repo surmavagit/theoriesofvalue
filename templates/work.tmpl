@@ -1,0 +1,17 @@
+{{ header .TitleMain }}
+            <h1>{{ .TitleMain }}</h1>
+            <dl>
+                {{ if not .Year }}{{ else }}
+                <dt>Created:</dt>
+                <dd>{{ .Year }}</dd>
+                {{ end }}
+                {{ if not .Wikidata }}{{ else }}
+                <dt>Wikidata:</dt>
+                <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
+                {{ end }}
+                {{ if not .Wikipedia }}{{ else }}
+                <dt>Wikipedia:</dt>
+                <dd><a href="https://{{ .Wikipedia.Code }}.wikipedia.org/wiki/{{ .Wikipedia.Name }}">{{ .Wikipedia.Code }}.wikipedia.org/wiki/{{ .Wikipedia.Name }}</a></dd>
+                {{ end }}
+            </dl>
+{{ footer }}
