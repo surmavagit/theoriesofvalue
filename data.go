@@ -97,7 +97,7 @@ func (db *DB) Create(schemaFile string, dataFile string) error {
 }
 
 func (db *DB) getAuthorData() ([]Author, error) {
-	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, wikidata, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "'WHERE page = true ORDER BY main_part;"
+	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part), pagename AS fullname, wikidata, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "'LEFT JOIN wikipedia ON author.wikidata = wikipedia.id AND wikipedia.lang = '" + siteLang + "' WHERE page = true ORDER BY main_part;"
 	authorRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -107,7 +107,9 @@ func (db *DB) getAuthorData() ([]Author, error) {
 	authorData := []Author{}
 	for authorRows.Next() {
 		a := Author{}
-		err := authorRows.Scan(&a.Slug, &a.Birth, &a.Death, &a.Name, &a.Wikidata, &a.OnlineBooks)
+		en := "en"
+		a.WikiLang = &en
+		err := authorRows.Scan(&a.Slug, &a.Birth, &a.Death, &a.Name, &a.Wikidata, &a.OnlineBooks, &a.WikiName)
 		if err != nil {
 			return nil, err
 		}

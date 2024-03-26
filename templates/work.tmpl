@@ -9,7 +9,7 @@
                 <dt>Wikidata:</dt>
                 <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
                 {{ end }}
-                {{ if and (not .WikiName) (not .WikiLang) }}{{ else }}
+                {{ if not .WikiName }}{{ else }}
                 <dt>Wikipedia:</dt>
                 <dd><a href="https://{{ .WikiLang }}.wikipedia.org/wiki/{{ .WikiName }}">{{ .WikiLang }}.wikipedia.org/wiki/{{ .WikiName }}</a></dd>
                 {{ end }}
