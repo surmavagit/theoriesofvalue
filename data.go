@@ -18,14 +18,10 @@ type Author struct {
 	Birth       *int
 	Death       *int
 	Wikidata    *string
-	Wikipedia   *Wikipedia
+	WikiLang    *string
+	WikiName    *string
 	OnlineBooks *string
 	Works       []Work
-}
-
-type Wikipedia struct {
-	Code string
-	Name string
 }
 
 type Work struct {
@@ -37,9 +33,9 @@ type Work struct {
 	TitleFirst *string
 	TitleMain  string
 	TitleLast  *string
-	FullTitle  string
 	Wikidata   *string
-	Wikipedia  *Wikipedia
+	WikiLang   *string
+	WikiName   *string
 }
 
 func dbConnect() (*DB, error) {
