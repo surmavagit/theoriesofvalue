@@ -18,8 +18,7 @@ type Author struct {
 	Birth       *int
 	Death       *int
 	Wikidata    *string
-	WikiLang    *string
-	WikiName    *string
+	Wikipedia   *string
 	OnlineBooks *string
 	Works       []Work
 }
@@ -34,8 +33,7 @@ type Work struct {
 	TitleMain  string
 	TitleLast  *string
 	Wikidata   *string
-	WikiLang   *string
-	WikiName   *string
+	Wikipedia  *string
 }
 
 func dbConnect() (*DB, error) {
@@ -97,7 +95,7 @@ func (db *DB) Create(schemaFile string, dataFile string) error {
 }
 
 func (db *DB) getAuthorData() ([]Author, error) {
-	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, pagename, wikidata, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "'LEFT JOIN wikipedia ON author.wikidata = wikipedia.id AND wikipedia.lang = '" + siteLang + "' WHERE page = true ORDER BY main_part;"
+	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, wikidata, wiki_for_eng, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "' WHERE page = true ORDER BY main_part;"
 	authorRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -107,9 +105,7 @@ func (db *DB) getAuthorData() ([]Author, error) {
 	authorData := []Author{}
 	for authorRows.Next() {
 		a := Author{}
-		en := "en"
-		a.WikiLang = &en
-		err := authorRows.Scan(&a.Slug, &a.Birth, &a.Death, &a.Name, &a.WikiName, &a.Wikidata, &a.OnlineBooks)
+		err := authorRows.Scan(&a.Slug, &a.Birth, &a.Death, &a.Name, &a.Wikidata, &a.Wikipedia, &a.OnlineBooks)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +141,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 	workData := []Work{}
 	selectFirstEditionYear := "SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug"
 	selectWorkAllAuthorsTable := "SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '" + siteLang + "' GROUP BY work_slug"
-	query := "SELECT authors.names, slug, dubious, wikidata, title.first_part, title.main_part, title.last_part, (" + selectFirstEditionYear + ") FROM work INNER JOIN title ON title.work_slug = work.slug AND title.lang = '" + siteLang + "' LEFT JOIN (" + selectWorkAllAuthorsTable + ") AS authors ON work.slug = authors.work_slug;" // WHERE page = true
+	query := "SELECT authors.names, slug, dubious, wikidata, title.first_part, title.main_part, title.last_part, (" + selectFirstEditionYear + ") FROM work INNER JOIN title ON title.work_slug = work.slug AND title.lang = '" + siteLang + "' LEFT JOIN (" + selectWorkAllAuthorsTable + ") AS authors ON work.slug = authors.work_slug ORDER BY year;" // WHERE page = true
 	workRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
