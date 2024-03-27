@@ -95,7 +95,7 @@ func (db *DB) Create(schemaFile string, dataFile string) error {
 }
 
 func (db *DB) getAuthorData() ([]Author, error) {
-	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, wikidata, wiki_for_eng, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "' WHERE page = true ORDER BY main_part;"
+	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, wikidata, CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) AS wikipedia, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "'LEFT JOIN wikipedia on author.wikidata = wikipedia.id and wikipedia.site_lang = '" + siteLang + "' WHERE page = true ORDER BY main_part;"
 	authorRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
