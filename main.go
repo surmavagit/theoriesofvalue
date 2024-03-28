@@ -104,13 +104,17 @@ func main() {
 		panic(err)
 	}
 
-	for i, w := range workData {
+	workPageData := []Work{}
+	for _, w := range workData {
+		if !w.Page {
+			continue
+		}
 		// get work details
 		authors, err := db.getWorkAuthors(w.Slug)
 		if err != nil {
 			panic(err)
 		}
-		workData[i].Authors = authors
+		w.Authors = authors
 
 		editions, err := db.getWorkEditions(w.Slug)
 		if err != nil {
@@ -124,10 +128,11 @@ func main() {
 			editions[i].Links = links
 		}
 
-		workData[i].Editions = editions
+		w.Editions = editions
+		workPageData = append(workPageData, w)
 	}
 
-	err = pageCollection("work.tmpl", funcMap, workData, "works")
+	err = pageCollection("work.tmpl", funcMap, workPageData, "works")
 	if err != nil {
 		panic(err)
 	}
