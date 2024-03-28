@@ -104,6 +104,29 @@ func main() {
 		panic(err)
 	}
 
+	for i, w := range workData {
+		// get work details
+		authors, err := db.getWorkAuthors(w.Slug)
+		if err != nil {
+			panic(err)
+		}
+		workData[i].Authors = authors
+
+		editions, err := db.getWorkEditions(w.Slug)
+		if err != nil {
+			panic(err)
+		}
+		for i, e := range editions {
+			links, err := db.getEditionLinks(w.Slug, e.Year)
+			if err != nil {
+				panic(err)
+			}
+			editions[i].Links = links
+		}
+
+		workData[i].Editions = editions
+	}
+
 	err = pageCollection("work.tmpl", funcMap, workData, "works")
 	if err != nil {
 		panic(err)

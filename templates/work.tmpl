@@ -1,10 +1,15 @@
 {{ header .TitleMain }}
-            <h1>{{ .TitleMain }}</h1>
-            <dl>
-                {{ if not .Year }}{{ else }}
-                <dt>Created:</dt>
-                <dd>{{ .Year }}</dd>
+            <hgroup>
+                <h1>{{ .TitleMain }}</h1>
+                <p>by 
+                {{ range $index, $author := .Authors }}
+                {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}{{ index }}">{{ .Name }}</a>
                 {{ end }}
+                </p>
+            </hgroup>
+            <dl>
+                <dt>Full Title:</dt>
+                <dd>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
                 {{ if not .Wikidata }}{{ else }}
                 <dt>Wikidata:</dt>
                 <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
@@ -14,4 +19,23 @@
                 <dd><a href="{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
                 {{ end }}
             </dl>
+            <section>
+                <h2>Editions</h2>
+                <ul>
+                {{ range .Editions }}
+                {{ if .Important }}
+                <li>
+                <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Description }}</p>
+                {{ if .Links }}
+                <ul>
+                    {{ range .Links }}
+                    <li><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</li>
+                    {{ end }}
+                </ul>
+                {{ end }}
+                </li>
+                {{ end }}
+                {{ end }}
+                </ul>
+            </section>
 {{ footer }}
