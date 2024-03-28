@@ -19,6 +19,7 @@ header, footer, nav > ul {
 
 nav > ul {
     justify-content: space-around;
+    list-style-type: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -26,8 +27,8 @@ h1, h2, h3, h4, h5, h6 {
     font-family: serif;
 }
 
-nav > ul {
-    list-style-type: none;
+#attribution {
+    text-align: center;
 }
 
 #logo {

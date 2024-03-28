@@ -1,7 +1,7 @@
 {{ header .TitleMain }}
             <hgroup>
                 <h1>{{ .TitleMain }}</h1>
-                <p>by 
+                <p id="attribution">by 
                 {{ range $index, $author := .Authors }}
                 {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}{{ index }}">{{ .Name }}</a>
                 {{ end }}
