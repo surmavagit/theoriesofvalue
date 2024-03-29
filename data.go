@@ -220,7 +220,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 }
 
 func (db *DB) getEditionLinks(workSlug string, editionYear int) ([]Link, error) {
-	query := fmt.Sprintf("SELECT website.label, CONCAT(website.domain, website.url, source.url), source.quality, source.download, source.description FROM link_content INNER JOIN source ON link_content.sitename = source.sitename and link_content.url = source.url INNER JOIN website ON source.sitename = website.sitename WHERE work_slug = '%s' AND year = %d;", workSlug, editionYear)
+	query := fmt.Sprintf("SELECT website.label, CONCAT(website.domain, website.url, source.url), source.quality, source.download, source.description FROM link_content INNER JOIN source ON link_content.sitename = source.sitename and link_content.url = source.url INNER JOIN website ON source.sitename = website.sitename WHERE work_slug = '%s' AND year = %d ORDER BY quality, download, website;", workSlug, editionYear)
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
