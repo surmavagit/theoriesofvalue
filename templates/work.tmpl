@@ -16,7 +16,7 @@
                 {{ end }}
                 {{ if not .Wikipedia }}{{ else }}
                 <dt>Wikipedia:</dt>
-                <dd><a href="{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
+                <dd><a href="https://{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
                 {{ end }}
             </dl>
             <section>
@@ -29,7 +29,10 @@
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}
-                    <li><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</li>
+                    <li>
+                        <span><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</span>
+                        {{ if .Description }}<span>{{ .Description }}</span>{{ end }}
+                    </li>
                     {{ end }}
                 </ul>
                 {{ end }}

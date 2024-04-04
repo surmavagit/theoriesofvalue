@@ -100,7 +100,7 @@ CREATE TABLE source(
     url varchar(120),
     quality varchar(20) REFERENCES quality(quality) NOT NULL,
     download bool NOT NULL,
-    description varchar(240) NOT NULL,
+    description varchar(240),
     PRIMARY KEY(sitename, url)
 );
 

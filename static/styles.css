@@ -22,6 +22,14 @@ nav > ul {
     list-style-type: none;
 }
 
+li {
+    margin-block: 1ex;
+}
+
+li > span {
+    display: block;
+}
+
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
     font-family: serif;
