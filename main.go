@@ -106,9 +106,6 @@ func main() {
 
 	workPageData := []Work{}
 	for _, w := range workData {
-		if !w.Page {
-			continue
-		}
 		// get work details
 		authors, err := db.getWorkAuthors(w.Slug)
 		if err != nil {
