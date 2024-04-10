@@ -28,7 +28,7 @@ INSERT INTO lang VALUES
 ('grc', NULL, 'ancient greek');
 
 CREATE TABLE author(
-    slug varchar(20) PRIMARY KEY,
+    slug varchar(20) PRIMARY KEY CONSTRAINT lowercase_or_minus CHECK (slug ~ '[a-z-]'),
     page bool NOT NULL,
     lang char(3) REFERENCES lang(three) NOT NULL,
     birth integer,
@@ -47,7 +47,7 @@ CREATE TABLE name(
 );
 
 CREATE TABLE work(
-    slug varchar(40) PRIMARY KEY,
+    slug varchar(40) PRIMARY KEY CONSTRAINT lowercase_or_minus CHECK (slug ~ '[a-z-]'),
     page bool NOT NULL,
     dubious bool NOT NULL,
     wikidata varchar(10) UNIQUE REFERENCES wikidata(id)
