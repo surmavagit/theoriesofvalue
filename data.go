@@ -178,7 +178,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 }
 
 func (db *DB) getWorkAuthors(workSlug string) ([]Author, error) {
-	query := "SELECT author_slug, CONCAT_WS(' ', first_part, main_part, last_part) FROM attribution LEFT JOIN name ON attribution.author_slug = name.author WHERE work_slug = '" + workSlug + "';"
+	query := "SELECT author_slug, CONCAT_WS(' ', first_part, main_part, last_part) FROM attribution LEFT JOIN name ON attribution.author_slug = name.author AND name.lang = '" + siteLang + "' WHERE work_slug = '" + workSlug + "';"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err

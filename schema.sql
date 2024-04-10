@@ -6,7 +6,6 @@ CREATE TABLE lang(
 
 CREATE TABLE wikidata(
     id varchar(10) PRIMARY KEY,
-    is_author bool NOT NULL,
     commons varchar(60) UNIQUE
 );
 
@@ -34,14 +33,14 @@ CREATE TABLE author(
     lang char(3) REFERENCES lang(three) NOT NULL,
     birth integer,
     death integer,
-    wikidata varchar(10) UNIQUE,
-    onlinebooks varchar(60) UNIQUE
+    wikidata varchar(10) UNIQUE REFERENCES wikidata(id),
+    onlinebooks varchar(80) UNIQUE
 );
 
 CREATE TABLE name(
     author varchar(20) REFERENCES author(slug),
     lang char(3) REFERENCES lang(three),
-    first_part varchar(30),
+    first_part varchar(40),
     main_part varchar(20) NOT NULL,
     last_part varchar(20),
     PRIMARY KEY(author, lang)
@@ -51,7 +50,7 @@ CREATE TABLE work(
     slug varchar(40) PRIMARY KEY,
     page bool NOT NULL,
     dubious bool NOT NULL,
-    wikidata varchar(10) UNIQUE
+    wikidata varchar(10) UNIQUE REFERENCES wikidata(id)
 );
 
 CREATE TABLE title(
