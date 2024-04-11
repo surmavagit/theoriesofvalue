@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 
@@ -92,7 +93,7 @@ func getEnv(envar string) (string, error) {
 func (db *DB) Create(schemaFile string, dataFile string) error {
 	table, err := os.ReadFile(schemaFile)
 	if err != nil {
-		return fmt.Errorf("can't read file: %w", err)
+		return fmt.Errorf("can't read schema.sql file: %w", err)
 	}
 	_, err = db.Exec(string(table))
 	if err != nil {
@@ -100,8 +101,11 @@ func (db *DB) Create(schemaFile string, dataFile string) error {
 	}
 
 	data, err := os.ReadFile(dataFile)
+	if errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("no data.sql file found")
+	}
 	if err != nil {
-		return fmt.Errorf("can't read file: %w", err)
+		return fmt.Errorf("can't read data.sql file: %w", err)
 	}
 	_, err = db.Exec(string(data))
 	if err != nil {
