@@ -10,6 +10,14 @@ body {
     max-width: 70ch;
 }
 
+ul {
+    padding: 0
+}
+
+li > ul {
+    padding-block-start: 3ch
+}
+
 header, footer, nav > ul {
     display: flex;
     justify-content: space-between;
@@ -33,6 +41,11 @@ li > span {
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
     font-family: serif;
+}
+
+.portrait {
+    display: block;
+    margin: auto;
 }
 
 #attribution {

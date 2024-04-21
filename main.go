@@ -14,6 +14,7 @@ const (
 	templatesDir = "templates"
 	authorsDir   = "authors"
 	worksDir     = "works"
+	portraitDir  = "portraits"
 	siteLang     = "eng"
 )
 
@@ -36,9 +37,31 @@ func mainReturnWithCode() int {
 		return 1
 	}
 	for _, sf := range staticFiles {
+		if sf.IsDir() {
+			continue
+		}
 		err := os.Link(path(staticDir, sf.Name()), path(outputDir, sf.Name()))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "can't copy static files: %s", err)
+			return 1
+		}
+	}
+
+	// copy portraits
+	err = os.Mkdir(path(outputDir, portraitDir), 0755)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't create portrait directory: %s", err)
+		return 1
+	}
+	portraitFiles, err := os.ReadDir(path(staticDir, portraitDir))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't read portrait directory: %s", err)
+		return 1
+	}
+	for _, pf := range portraitFiles {
+		err := os.Link(path(staticDir, portraitDir, pf.Name()), path(outputDir, portraitDir, pf.Name()))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "can't copy portraits: %s", err)
 			return 1
 		}
 	}

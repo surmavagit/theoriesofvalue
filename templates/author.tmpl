@@ -1,5 +1,6 @@
 {{ header .Name }}
             <h1>{{ .Name }}</h1>
+            {{ getPortrait .Slug }}
             <dl>
                 {{ if not .Birth }}{{ else }}
                 <dt>Birth:</dt>
