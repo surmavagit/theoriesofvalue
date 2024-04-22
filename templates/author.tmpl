@@ -28,7 +28,7 @@
                 <h2>Works</h2>
                 <ul>
                     {{ range .Works }}
-                    <li>{{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}{{ index }}">{{ end }}{{ if .Year }}{{ .Year }} - {{ end }} {{ .TitleMain }}{{ if .Page }}</a>{{ end }}</li>
+                    <li>{{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}">{{ end }}{{ if .Year }}{{ .Year }} - {{ end }} {{ .TitleMain }}{{ if .Page }}</a>{{ end }}</li>
                     {{ end }}
                 </ul>
             </section>

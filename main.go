@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -18,6 +19,11 @@ const (
 	siteLang     = "eng"
 )
 
+var (
+	address = "https://theoriesofvalue.com"
+	port    string
+)
+
 func main() {
 	os.Exit(mainReturnWithCode())
 }
@@ -28,6 +34,48 @@ func mainReturnWithCode() int {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "can't load .env file: %s", err)
 		return 1
+	}
+
+	// check args
+	argNumber := len(os.Args)
+	if argNumber > 3 {
+		fmt.Fprint(os.Stderr, "incorrect number of arguments")
+		return 1
+	}
+
+	if argNumber > 1 && os.Args[1] != "-p" {
+		fmt.Fprint(os.Stderr, "incorrect option provided")
+		return 1
+	}
+
+	// get default port from .env file, if needed
+	if argNumber == 2 {
+		lport, ok := os.LookupEnv("LOCALPORT")
+		if !ok {
+			fmt.Fprint(os.Stderr, "no LOCALPATH defined in .env file")
+			return 1
+		}
+		port = lport
+	}
+
+	// get port number from provided argument, if needed
+	if argNumber == 3 {
+		onlyNums := regexp.MustCompile(`^\d+$`)
+		port = os.Args[2]
+		if !onlyNums.MatchString(port) {
+			fmt.Fprint(os.Stderr, "incorrect port number provided")
+			return 1
+		}
+	}
+
+	// set development address, if needed
+	if argNumber > 1 {
+		lpath, ok := os.LookupEnv("LOCALPATH")
+		if !ok {
+			fmt.Fprint(os.Stderr, "no LOCALPATH defined in .env file")
+			return 1
+		}
+		address = lpath + port
 	}
 
 	// copy static files
