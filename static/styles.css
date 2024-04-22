@@ -15,7 +15,7 @@ ul {
 }
 
 li > ul {
-    padding-block-start: 3ch
+    padding-inline-start: 3ch
 }
 
 header, footer, nav > ul {
