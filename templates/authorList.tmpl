@@ -2,7 +2,7 @@
             <h1>Authors</h1>
             <ul>
                 {{ range . }}
-                <li><a href="{{ domain }}/authors/{{ .Slug }}{{ index }}">
+                <li><a href="{{ domain }}/authors/{{ .Slug }}">
                     {{ .Name }} ({{ if not .Birth }}?{{ else }}{{ .Birth }}{{ end }}-{{ if not .Death }}?{{ else }}{{ .Death }}{{ end }})
                 </a></li>
                 {{ end }}
