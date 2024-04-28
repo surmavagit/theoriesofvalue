@@ -49,7 +49,8 @@ CREATE TABLE name(
 CREATE TABLE work(
     slug varchar(40) PRIMARY KEY CONSTRAINT lowercase_or_minus CHECK (slug ~ '[a-z-]'),
     page bool NOT NULL,
-    dubious bool NOT NULL,
+    lang char(3) REFERENCES lang(three) NOT NULL,
+    translation varchar(40) REFERENCES work(slug),
     wikidata varchar(10) UNIQUE REFERENCES wikidata(id)
 );
 
@@ -65,6 +66,7 @@ CREATE TABLE title(
 CREATE TABLE attribution(
     author_slug varchar(20) REFERENCES author(slug),
     work_slug varchar(40) REFERENCES work(slug),
+    dubious bool NOT NULL,
     PRIMARY KEY(author_slug, work_slug)
 );
 
@@ -72,8 +74,6 @@ CREATE TABLE edition(
     work_slug varchar(40) REFERENCES work(slug),
     year integer,
     important bool NOT NULL,
-    lang char(3) REFERENCES lang(three) NOT NULL,
-    translator varchar(20) REFERENCES author(slug),
     description varchar(240) NOT NULL,
     PRIMARY KEY(work_slug, year)
 );
