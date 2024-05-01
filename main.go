@@ -167,7 +167,7 @@ func mainReturnWithCode() int {
 
 	err = pageCollection("author.tmpl", funcMap, authorsData, "authors")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't create authors pages: %s", err)
+		fmt.Fprintf(os.Stderr, "can't create pages for authors: %s", err)
 		return 1
 	}
 
@@ -211,14 +211,14 @@ func mainReturnWithCode() int {
 			}
 			editions[i].Links = links
 		}
-
 		w.Editions = editions
+
 		workPageData = append(workPageData, w)
 	}
 
 	err = pageCollection("work.tmpl", funcMap, workPageData, "works")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't create works pages: %s", err)
+		fmt.Fprintf(os.Stderr, "can't create pages for works: %s", err)
 		return 1
 	}
 	return 0
