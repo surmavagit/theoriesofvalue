@@ -5,12 +5,21 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
 
 type DB struct {
 	*sql.DB
+}
+
+func (db DB) sqlQuery(columns []string, tables []string, rest string) (*sql.Rows, error) {
+	return db.Query(fmt.Sprintf("SELECT %s FROM %s %s;", strings.Join(columns, ", "), strings.Join(tables, " "), rest))
+}
+
+func (db DB) selectFirstEditionYear() string {
+	return "(SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug)"
 }
 
 type Author struct {
@@ -117,8 +126,22 @@ func (db *DB) Create(schemaFile string, dataFile string) error {
 }
 
 func (db *DB) getAuthorData() ([]Author, error) {
-	query := "SELECT slug, birth, death, CONCAT(first_part, ' ', main_part, ' ', last_part) AS fullname, wikidata, CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END, onlinebooks FROM author INNER JOIN name ON author.slug = name.author AND name.lang = '" + siteLang + "'LEFT JOIN wikipedia ON author.wikidata = wikipedia.id AND wikipedia.site_lang = '" + siteLang + "' WHERE page = true ORDER BY main_part;"
-	authorRows, err := db.Query(query)
+	columns := []string{
+		"slug",
+		"birth",
+		"death",
+		"CONCAT_WS(' ', first_part, main_part, last_part) AS fullname",
+		"wikidata",
+		"CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia", "'.wikipedia.org/wiki/'", "slug_pedia) END",
+		"onlinebooks",
+	}
+	tables := []string{
+		"author",
+		fmt.Sprintf("INNER JOIN name ON author.slug = name.author AND name.lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN wikipedia ON author.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
+	}
+	rest := "WHERE page = true ORDER BY main_part"
+	authorRows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}
@@ -138,15 +161,26 @@ func (db *DB) getAuthorData() ([]Author, error) {
 }
 
 func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
-	authorWorks := []Work{}
-	selectFirstEditionYear := "SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug"
-	query := "SELECT slug, page, title.main_part, (" + selectFirstEditionYear + ") FROM work LEFT JOIN title ON work.slug = title.work_slug AND title.lang = '" + siteLang + "' LEFT JOIN attribution ON work.slug = attribution.work_slug LEFT JOIN name ON name.author = attribution.author_slug AND name.lang = '" + siteLang + "' WHERE name.author = '" + authorSlug + "' ORDER BY year;"
-	workRows, err := db.Query(query)
+	columns := []string{
+		"slug",
+		"page",
+		"title.main_part",
+		db.selectFirstEditionYear(),
+	}
+	tables := []string{
+		"work",
+		fmt.Sprintf("LEFT JOIN title ON work.slug = title.work_slug AND title.lang = '%s'", siteLang),
+		"LEFT JOIN attribution ON work.slug = attribution.work_slug",
+		fmt.Sprintf("LEFT JOIN name ON name.author = attribution.author_slug AND name.lang = '%s'", siteLang),
+	}
+	rest := fmt.Sprintf("WHERE name.author = '%s' ORDER BY year", authorSlug)
+	workRows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}
 	defer workRows.Close()
 
+	authorWorks := []Work{}
 	for workRows.Next() {
 		a := Work{}
 		err := workRows.Scan(&a.Slug, &a.Page, &a.TitleMain, &a.Year)
@@ -161,10 +195,26 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 
 func (db *DB) getWorkData() ([]Work, error) {
 	workData := []Work{}
-	selectFirstEditionYear := "SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug"
-	selectWorkAllAuthorsTable := "SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '" + siteLang + "' GROUP BY work_slug"
-	query := "SELECT authors.names, INITCAP(eng_desc), slug, wikidata, CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END, title.main_part, CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END, (" + selectFirstEditionYear + ") FROM work INNER JOIN title ON title.work_slug = work.slug AND title.lang = '" + siteLang + "' LEFT JOIN (" + selectWorkAllAuthorsTable + ") AS authors ON work.slug = authors.work_slug LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '" + siteLang + "' INNER JOIN lang ON work.lang = lang.three WHERE page = true ORDER BY year;"
-	workRows, err := db.Query(query)
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' GROUP BY work_slug)", siteLang)
+	columns := []string{
+		"authors.names",
+		"INITCAP(eng_desc)",
+		"slug",
+		"wikidata",
+		"CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END",
+		"title.main_part",
+		"CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END",
+		db.selectFirstEditionYear(),
+	}
+	tables := []string{
+		"work",
+		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
+		fmt.Sprintf("LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
+		"INNER JOIN lang ON work.lang = lang.three",
+	}
+	rest := "WHERE page = true ORDER BY year"
+	workRows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}
@@ -183,8 +233,16 @@ func (db *DB) getWorkData() ([]Work, error) {
 }
 
 func (db *DB) getWorkAuthors(workSlug string) ([]Author, error) {
-	query := "SELECT author_slug, CONCAT_WS(' ', first_part, main_part, last_part) FROM attribution LEFT JOIN name ON attribution.author_slug = name.author AND name.lang = '" + siteLang + "' WHERE work_slug = '" + workSlug + "';"
-	rows, err := db.Query(query)
+	columns := []string{
+		"author_slug",
+		"CONCAT_WS(' ', first_part, main_part, last_part)",
+	}
+	tables := []string{
+		"attribution",
+		fmt.Sprintf("LEFT JOIN name ON attribution.author_slug = name.author AND name.lang = '%s'", siteLang),
+	}
+	rest := fmt.Sprintf("WHERE work_slug = '%s'", workSlug)
+	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}
@@ -204,8 +262,18 @@ func (db *DB) getWorkAuthors(workSlug string) ([]Author, error) {
 }
 
 func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
-	query := "SELECT important, year, lang, description FROM edition INNER JOIN work on work.slug = edition.work_slug WHERE work_slug = '" + workSlug + "';"
-	rows, err := db.Query(query)
+	columns := []string{
+		"important",
+		"year",
+		"lang",
+		"description",
+	}
+	tables := []string{
+		"edition",
+		"INNER JOIN work on work.slug = edition.work_slug",
+	}
+	rest := fmt.Sprintf("WHERE work_slug = '%s'", workSlug)
+	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}
@@ -225,8 +293,20 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 }
 
 func (db *DB) getEditionLinks(workSlug string, editionYear int) ([]Link, error) {
-	query := fmt.Sprintf("SELECT website.label, CONCAT(website.domain, website.url, source.url), source.quality, source.download, source.description FROM link_content INNER JOIN source ON link_content.sitename = source.sitename and link_content.url = source.url INNER JOIN website ON source.sitename = website.sitename WHERE work_slug = '%s' AND year = %d ORDER BY quality, download, website, length(description);", workSlug, editionYear)
-	rows, err := db.Query(query)
+	columns := []string{
+		"website.label",
+		"CONCAT(website.domain, website.url, source.url)",
+		"source.quality",
+		"source.download",
+		"source.description",
+	}
+	tables := []string{
+		"link_content",
+		"INNER JOIN source ON link_content.sitename = source.sitename AND link_content.url = source.url",
+		"INNER JOIN website ON source.sitename = website.sitename",
+	}
+	rest := fmt.Sprintf("WHERE work_slug = '%s' AND year = %d ORDER BY quality, download, website, length(description)", workSlug, editionYear)
+	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}

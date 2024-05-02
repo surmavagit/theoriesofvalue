@@ -189,6 +189,7 @@ func mainReturnWithCode() int {
 		return 1
 	}
 
+	// generate work pages
 	workTmpl := template.Must(template.New("work.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, "work.tmpl")))
 	for _, w := range workData {
 		// get work details
