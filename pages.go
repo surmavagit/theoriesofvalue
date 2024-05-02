@@ -7,13 +7,13 @@ import (
 )
 
 type Page interface {
-	GetSlug() string
+	getSlug() string
 }
 
-func (a Author) GetSlug() string {
+func (a Author) getSlug() string {
 	return a.Slug
 }
-func (w Work) GetSlug() string {
+func (w Work) getSlug() string {
 	return w.Slug
 }
 
@@ -27,7 +27,7 @@ func uniquePage(tmplName string, funcMap template.FuncMap, data any, path string
 }
 
 func createPageInDir(p Page, tmpl *template.Template, commonPath string) error {
-	slug := p.GetSlug()
+	slug := p.getSlug()
 	err := os.Mkdir(strings.Join([]string{outputDir, commonPath, slug}, "/"), 0755)
 	if err != nil {
 		return err
