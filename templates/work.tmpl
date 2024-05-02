@@ -10,6 +10,8 @@
             <dl>
                 <dt>Full Title:</dt>
                 <dd>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
+                <dt>Original language:</dt>
+                <dd>{{ .Lang }}</dd>
                 {{ if not .Wikidata }}{{ else }}
                 <dt>Wikidata:</dt>
                 <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
@@ -23,7 +25,6 @@
                 <h2>Editions</h2>
                 <ul>
                 {{ range .Editions }}
-                {{ if .Important }}
                 <li>
                 <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Description }}</p>
                 {{ if .Links }}
@@ -37,7 +38,6 @@
                 </ul>
                 {{ end }}
                 </li>
-                {{ end }}
                 {{ end }}
                 </ul>
             </section>
