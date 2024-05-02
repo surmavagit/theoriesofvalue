@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"os"
 	"regexp"
 	"strings"
@@ -154,21 +155,21 @@ func mainReturnWithCode() int {
 	}
 
 	// generate author pages
-
-	for i, a := range authorsData {
+	authorTmpl := template.Must(template.New("author.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, "author.tmpl")))
+	for _, a := range authorsData {
 		// get data on author's works
 		works, err := db.getAuthorWorks(a.Slug)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "can't get author works data: %s", err)
 			return 1
 		}
-		authorsData[i].Works = works
-	}
+		a.Works = works
 
-	err = pageCollection("author.tmpl", funcMap, authorsData, "authors")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't create pages for authors: %s", err)
-		return 1
+		err = createPageInDir(a, authorTmpl, "authors")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "can't create pages for authors: %s", err)
+			return 1
+		}
 	}
 
 	// generate works list
@@ -188,7 +189,7 @@ func mainReturnWithCode() int {
 		return 1
 	}
 
-	workPageData := []Work{}
+	workTmpl := template.Must(template.New("work.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, "work.tmpl")))
 	for _, w := range workData {
 		// get work details
 		authors, err := db.getWorkAuthors(w.Slug)
@@ -213,14 +214,13 @@ func mainReturnWithCode() int {
 		}
 		w.Editions = editions
 
-		workPageData = append(workPageData, w)
+		err = createPageInDir(w, workTmpl, "works")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "can't create pages for works: %s", err)
+			return 1
+		}
 	}
 
-	err = pageCollection("work.tmpl", funcMap, workPageData, "works")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't create pages for works: %s", err)
-		return 1
-	}
 	return 0
 }
 
