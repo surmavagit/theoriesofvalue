@@ -27,6 +27,7 @@ type Author struct {
 type Work struct {
 	Slug       string
 	Page       bool
+	Lang       string
 	Year       *int
 	AllAuthors *string
 	Authors    []Author
@@ -162,7 +163,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 	workData := []Work{}
 	selectFirstEditionYear := "SELECT MIN(year) AS year FROM edition WHERE edition.work_slug = work.slug"
 	selectWorkAllAuthorsTable := "SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '" + siteLang + "' GROUP BY work_slug"
-	query := "SELECT authors.names, slug, dubious, wikidata, CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END, title.main_part, CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END, (" + selectFirstEditionYear + ") FROM work INNER JOIN title ON title.work_slug = work.slug AND title.lang = '" + siteLang + "' LEFT JOIN (" + selectWorkAllAuthorsTable + ") AS authors ON work.slug = authors.work_slug LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '" + siteLang + "' WHERE page = true ORDER BY year;"
+	query := "SELECT authors.names, INITCAP(eng_desc), slug, wikidata, CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END, title.main_part, CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END, (" + selectFirstEditionYear + ") FROM work INNER JOIN title ON title.work_slug = work.slug AND title.lang = '" + siteLang + "' LEFT JOIN (" + selectWorkAllAuthorsTable + ") AS authors ON work.slug = authors.work_slug LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '" + siteLang + "' INNER JOIN lang ON work.lang = lang.three WHERE page = true ORDER BY year;"
 	workRows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -171,7 +172,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 
 	for workRows.Next() {
 		w := Work{}
-		err := workRows.Scan(&w.AllAuthors, &w.Slug, &w.Dubious, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
+		err := workRows.Scan(&w.AllAuthors, &w.Lang, &w.Slug, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
 		if err != nil {
 			return nil, err
 		}
@@ -203,7 +204,7 @@ func (db *DB) getWorkAuthors(workSlug string) ([]Author, error) {
 }
 
 func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
-	query := "SELECT important, year, lang, description FROM edition WHERE work_slug = '" + workSlug + "';"
+	query := "SELECT important, year, lang, description FROM edition INNER JOIN work on work.slug = edition.work_slug WHERE work_slug = '" + workSlug + "';"
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err

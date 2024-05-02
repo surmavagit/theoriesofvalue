@@ -1,7 +1,7 @@
 CREATE TABLE lang(
     three char(3) PRIMARY KEY,
     two char(2) UNIQUE,
-    english varchar(20) NOT NULL
+    eng_desc varchar(20) NOT NULL
 );
 
 CREATE TABLE wikidata(
