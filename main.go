@@ -206,7 +206,7 @@ func mainReturnWithCode() int {
 			return 1
 		}
 		for i, e := range editions {
-			links, err := db.getEditionLinks(w.Slug, e.Year)
+			links, err := db.getEditionLinks(e.Slug, e.Year)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "can't get edition link data: %s", err)
 				return 1

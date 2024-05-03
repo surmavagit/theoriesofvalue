@@ -49,6 +49,7 @@ type Work struct {
 }
 
 type Edition struct {
+	Slug        string
 	Year        int
 	Important   bool
 	Lang        string
@@ -263,16 +264,17 @@ func (db *DB) getWorkAuthors(workSlug string) ([]Author, error) {
 
 func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 	columns := []string{
-		"important",
+		"work.slug",
 		"year",
-		"lang",
-		"description",
+		fmt.Sprintf("CASE WHEN work.slug = '%s' THEN description ELSE CONCAT(INITCAP(lang.eng_desc), ' translation (', COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous'), '): \"', title.main_part, '\"') END", workSlug, siteLang),
 	}
 	tables := []string{
 		"edition",
-		"INNER JOIN work on work.slug = edition.work_slug",
+		"INNER JOIN work ON work.slug = edition.work_slug",
+		"INNER JOIN lang ON lang.three = work.lang",
+		"INNER JOIN title ON title.work_slug = work.slug",
 	}
-	rest := fmt.Sprintf("WHERE work_slug = '%s'", workSlug)
+	rest := fmt.Sprintf("WHERE work.slug = '%s' OR (translation = '%s' AND important = true)", workSlug, workSlug)
 	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
@@ -282,7 +284,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 	editions := []Edition{}
 	for rows.Next() {
 		e := Edition{}
-		err := rows.Scan(&e.Important, &e.Year, &e.Lang, &e.Description)
+		err := rows.Scan(&e.Slug, &e.Year, &e.Description)
 		if err != nil {
 			return nil, err
 		}
