@@ -3,7 +3,7 @@
                 <h1>{{ .TitleMain }}</h1>
                 <p id="attribution">by 
                 {{ range $index, $author := .Authors }}
-                {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}">{{ .Name }}</a>
+                {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}/">{{ .Name }}</a>
                 {{ end }}
                 </p>
             </hgroup>
