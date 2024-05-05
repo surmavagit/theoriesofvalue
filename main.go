@@ -215,6 +215,21 @@ func mainReturnWithCode() int {
 		}
 		w.Editions = editions
 
+		translations, err := db.getWorkTranslations(w.Slug)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "can't get work translations data: %s", err)
+			return 1
+		}
+		for j, t := range translations {
+			links, err := db.getEditionLinks(t.Slug, t.Year)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "can't get edition link data: %s", err)
+				return 1
+			}
+			translations[j].Links = links
+		}
+		w.Translations = translations
+
 		err = createPageInDir(w, workTmpl, "works")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "can't create pages for works: %s", err)
