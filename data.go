@@ -34,18 +34,19 @@ type Author struct {
 }
 
 type Work struct {
-	Slug       string
-	Page       bool
-	Lang       string
-	Year       *int
-	AllAuthors *string
-	Authors    []Author
-	Dubious    bool
-	TitleMain  string
-	FullTitle  *string
-	Wikidata   *string
-	Wikipedia  *string
-	Editions   []Edition
+	Slug         string
+	Page         bool
+	Lang         string
+	Year         *int
+	AllAuthors   *string
+	Authors      []Author
+	Dubious      bool
+	TitleMain    string
+	FullTitle    *string
+	Wikidata     *string
+	Wikipedia    *string
+	Editions     []Edition
+	Translations []Translation
 }
 
 type Edition struct {
@@ -53,6 +54,16 @@ type Edition struct {
 	Year        int
 	Important   bool
 	Lang        string
+	Description string
+	Links       []Link
+}
+
+type Translation struct {
+	Slug        string
+	AllAuthors  *string
+	Year        int
+	Lang        string
+	TitleMain   string
 	Description string
 	Links       []Link
 }
@@ -274,7 +285,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 		"INNER JOIN lang ON lang.three = work.lang",
 		"INNER JOIN title ON title.work_slug = work.slug",
 	}
-	rest := fmt.Sprintf("WHERE work.slug = '%s' OR (translation = '%s' AND important = true)", workSlug, workSlug)
+	rest := fmt.Sprintf("WHERE important = true AND (work.slug = '%s' OR translation = '%s')", workSlug, workSlug)
 	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
@@ -294,6 +305,41 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 	return editions, nil
 }
 
+func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' GROUP BY work_slug)", siteLang)
+	columns := []string{
+		"work.slug",
+		"authors.names",
+		"year",
+		"INITCAP(lang.eng_desc)",
+		"title.main_part",
+		"description",
+	}
+	tables := []string{
+		"edition",
+		fmt.Sprintf("INNER JOIN work ON work.slug = edition.work_slug AND translation = '%s'", workSlug),
+		fmt.Sprintf("LEFT JOIN %s AS authors ON edition.work_slug = authors.work_slug", selectWorkAllAuthorsTable),
+		"INNER JOIN lang ON lang.three = work.lang",
+		"INNER JOIN title ON title.work_slug = work.slug",
+	}
+	rows, err := db.sqlQuery(columns, tables, "")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	translations := []Translation{}
+	for rows.Next() {
+		t := Translation{}
+		err := rows.Scan(&t.Slug, &t.AllAuthors, &t.Year, &t.Lang, &t.TitleMain, &t.Description)
+		if err != nil {
+			return nil, err
+		}
+		translations = append(translations, t)
+	}
+
+	return translations, nil
+}
 func (db *DB) getEditionLinks(workSlug string, editionYear int) ([]Link, error) {
 	columns := []string{
 		"website.label",
