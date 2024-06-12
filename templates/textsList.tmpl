@@ -1,0 +1,12 @@
+{{ header "Read" }}
+            <h1>Read on Theories of Value</h1>
+            <ul>
+                {{ range . }}
+                <li>
+                    <a href="{{ domain }}/read/{{ .Slug }}.html">
+                    {{ if .Year }}{{ .Year }} - {{ end }}{{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}{{ .TitleMain }}
+                    </a>
+                </li>
+                {{ end }}
+            </ul>
+{{ footer }}

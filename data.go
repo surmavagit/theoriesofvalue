@@ -372,3 +372,40 @@ func (db *DB) getEditionLinks(workSlug string, editionYear int) ([]Link, error) 
 
 	return links, nil
 }
+
+func (db *DB) getTextsData() ([]Work, error) {
+	workData := []Work{}
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' GROUP BY work_slug)", siteLang)
+	columns := []string{
+		"authors.names",
+		"INITCAP(eng_desc)",
+		"slug",
+		"title.main_part",
+		"CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END",
+		db.selectFirstEditionYear(),
+	}
+	tables := []string{
+		"work",
+		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
+		"INNER JOIN lang ON work.lang = lang.three",
+		"INNER JOIN link_content ON link_content.work_slug = work.slug",
+	}
+	rest := "WHERE sitename = 'theories' ORDER BY year"
+	workRows, err := db.sqlQuery(columns, tables, rest)
+	if err != nil {
+		return nil, err
+	}
+	defer workRows.Close()
+
+	for workRows.Next() {
+		w := Work{}
+		err := workRows.Scan(&w.AllAuthors, &w.Lang, &w.Slug, &w.TitleMain, &w.FullTitle, &w.Year)
+		if err != nil {
+			return nil, err
+		}
+		workData = append(workData, w)
+	}
+
+	return workData, nil
+}

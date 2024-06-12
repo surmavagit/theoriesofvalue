@@ -16,6 +16,7 @@ const (
 	templatesDir = "templates"
 	authorsDir   = "authors"
 	worksDir     = "works"
+	textsDir     = "read"
 	portraitDir  = "portraits"
 	siteLang     = "eng"
 )
@@ -111,6 +112,25 @@ func mainReturnWithCode() int {
 		err := os.Link(path(staticDir, portraitDir, pf.Name()), path(outputDir, portraitDir, pf.Name()))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "can't copy portraits: %s", err)
+			return 1
+		}
+	}
+
+	// copy texts
+	err = os.Mkdir(path(outputDir, textsDir), 0755)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't create texts directory: %s", err)
+		return 1
+	}
+	textsFiles, err := os.ReadDir(path(staticDir, textsDir))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't read texts directory: %s", err)
+		return 1
+	}
+	for _, tf := range textsFiles {
+		err := os.Link(path(staticDir, textsDir, tf.Name()), path(outputDir, textsDir, tf.Name()))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "can't copy texts: %s", err)
 			return 1
 		}
 	}
@@ -235,6 +255,18 @@ func mainReturnWithCode() int {
 			fmt.Fprintf(os.Stderr, "can't create pages for works: %s", err)
 			return 1
 		}
+	}
+
+	// generate list of readable texts
+	textsData, err := db.getTextsData()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't get texts data: %s", err)
+		return 1
+	}
+	err = uniquePage("textsList.tmpl", funcMap, textsData, path(outputDir, textsDir, "index.html"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't create readList page: %s", err)
+		return 1
 	}
 
 	return 0
