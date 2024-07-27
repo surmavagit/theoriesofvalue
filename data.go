@@ -285,7 +285,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 		"INNER JOIN lang ON lang.three = work.lang",
 		"INNER JOIN title ON title.work_slug = work.slug",
 	}
-	rest := fmt.Sprintf("WHERE important = true AND (work.slug = '%s' OR translation = '%s')", workSlug, workSlug)
+	rest := fmt.Sprintf("WHERE important = true AND (work.slug = '%s' OR translation = '%s') ORDER BY year", workSlug, workSlug)
 	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
@@ -322,7 +322,7 @@ func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
 		"INNER JOIN lang ON lang.three = work.lang",
 		"INNER JOIN title ON title.work_slug = work.slug",
 	}
-	rows, err := db.sqlQuery(columns, tables, "")
+	rows, err := db.sqlQuery(columns, tables, "ORDER BY year")
 	if err != nil {
 		return nil, err
 	}
