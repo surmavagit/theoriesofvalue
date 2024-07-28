@@ -55,6 +55,7 @@ type Edition struct {
 	Important   bool
 	Lang        string
 	Description string
+	Translation *string
 	Links       []Link
 }
 
@@ -277,7 +278,8 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 	columns := []string{
 		"work.slug",
 		"year",
-		fmt.Sprintf("CASE WHEN work.slug = '%s' THEN description ELSE CONCAT(INITCAP(lang.eng_desc), ' translation (', COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous'), '): \"', title.main_part, '\"') END", workSlug, siteLang),
+		"description",
+		fmt.Sprintf("CASE WHEN work.translation IS NOT NULL THEN CONCAT(INITCAP(lang.eng_desc), ' translation (', COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous'), '): \"', title.main_part, '\"') END", siteLang),
 	}
 	tables := []string{
 		"edition",
@@ -295,7 +297,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 	editions := []Edition{}
 	for rows.Next() {
 		e := Edition{}
-		err := rows.Scan(&e.Slug, &e.Year, &e.Description)
+		err := rows.Scan(&e.Slug, &e.Year, &e.Description, &e.Translation)
 		if err != nil {
 			return nil, err
 		}

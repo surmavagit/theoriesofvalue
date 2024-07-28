@@ -25,21 +25,25 @@
             <section>
                 <h2>Editions</h2>
                 <ul>
-                {{ range .Editions }}
-                <li>
-                <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Description }}</p>
-                {{ if .Links }}
-                <ul>
-                    {{ range .Links }}
+                    {{ range .Editions }}
                     <li>
-                        <span><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</span>
-                        {{ if .Description }}<span>{{ .Description }}</span>{{ end }}
+                    {{ if not .Translation }}
+                    <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Description }}</p>
+                    {{ else }}
+                    <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Translation }} - {{ .Description }}</p>
+                    {{ end }}
+                    {{ if .Links }}
+                    <ul>
+                        {{ range .Links }}
+                        <li>
+                            <span><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</span>
+                            {{ if .Description }}<span>{{ .Description }}</span>{{ end }}
+                        </li>
+                        {{ end }}
+                    </ul>
+                    {{ end }}
                     </li>
                     {{ end }}
-                </ul>
-                {{ end }}
-                </li>
-                {{ end }}
                 </ul>
             </section>
             {{ end }}
@@ -49,7 +53,7 @@
                 <ul>
                 {{ range .Translations }}
                 <li>
-                <p>{{ .Lang }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ end }}- "{{ .TitleMain }}"</p>
+                <p>{{ .Lang }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ end }}- "{{ .TitleMain }}"{{ if .Description }} - {{ .Description }}{{ end }}</p>
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}
