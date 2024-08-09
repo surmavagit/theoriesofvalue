@@ -39,11 +39,11 @@ CREATE TABLE author(
 
 CREATE TABLE name(
     author varchar(20) REFERENCES author(slug),
-    lang char(3) REFERENCES lang(three),
+    site_lang char(3) REFERENCES lang(three),
     first_part varchar(40),
     main_part varchar(20) NOT NULL,
     last_part varchar(20),
-    PRIMARY KEY(author, lang)
+    PRIMARY KEY(author, site_lang)
 );
 
 CREATE TABLE work(
@@ -56,11 +56,11 @@ CREATE TABLE work(
 
 CREATE TABLE title(
     work_slug varchar(40) REFERENCES work(slug),
-    lang char(3) REFERENCES lang(three),
+    site_lang char(3) REFERENCES lang(three),
     first_part varchar(60),
     main_part varchar(70) NOT NULL,
     last_part varchar(560),
-    PRIMARY KEY(work_slug, lang)
+    PRIMARY KEY(work_slug, site_lang)
 );
 
 CREATE TABLE attribution(

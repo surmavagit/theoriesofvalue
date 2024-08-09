@@ -150,7 +150,7 @@ func (db *DB) getAuthorData() ([]Author, error) {
 	}
 	tables := []string{
 		"author",
-		fmt.Sprintf("INNER JOIN name ON author.slug = name.author AND name.lang = '%s'", siteLang),
+		fmt.Sprintf("INNER JOIN name ON author.slug = name.author AND name.site_lang = '%s'", siteLang),
 		fmt.Sprintf("LEFT JOIN wikipedia ON author.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
 	}
 	rest := "WHERE page = true ORDER BY main_part"
@@ -182,9 +182,9 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 	}
 	tables := []string{
 		"work",
-		fmt.Sprintf("LEFT JOIN title ON work.slug = title.work_slug AND title.lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN title ON work.slug = title.work_slug AND title.site_lang = '%s'", siteLang),
 		"LEFT JOIN attribution ON work.slug = attribution.work_slug",
-		fmt.Sprintf("LEFT JOIN name ON name.author = attribution.author_slug AND name.lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN name ON name.author = attribution.author_slug AND name.site_lang = '%s'", siteLang),
 	}
 	rest := fmt.Sprintf("WHERE name.author = '%s' ORDER BY year", authorSlug)
 	workRows, err := db.sqlQuery(columns, tables, rest)
@@ -208,7 +208,7 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 
 func (db *DB) getWorkData() ([]Work, error) {
 	workData := []Work{}
-	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' GROUP BY work_slug)", siteLang)
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
 	columns := []string{
 		"authors.names",
 		"INITCAP(eng_desc)",
@@ -221,7 +221,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 	}
 	tables := []string{
 		"work",
-		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.lang = '%s'", siteLang),
+		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.site_lang = '%s'", siteLang),
 		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
 		fmt.Sprintf("LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
 		"INNER JOIN lang ON work.lang = lang.three",
@@ -252,7 +252,7 @@ func (db *DB) getWorkAuthors(workSlug string) ([]Author, error) {
 	}
 	tables := []string{
 		"attribution",
-		fmt.Sprintf("LEFT JOIN name ON attribution.author_slug = name.author AND name.lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s'", siteLang),
 	}
 	rest := fmt.Sprintf("WHERE work_slug = '%s'", workSlug)
 	rows, err := db.sqlQuery(columns, tables, rest)
@@ -279,7 +279,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 		"work.slug",
 		"year",
 		"description",
-		fmt.Sprintf("CASE WHEN work.translation IS NOT NULL THEN CONCAT(INITCAP(lang.eng_desc), ' translation (', COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous'), '): \"', title.main_part, '\"') END", siteLang),
+		fmt.Sprintf("CASE WHEN work.translation IS NOT NULL THEN CONCAT(INITCAP(lang.eng_desc), ' translation (', COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous'), '): \"', title.main_part, '\"') END", siteLang),
 	}
 	tables := []string{
 		"edition",
@@ -308,7 +308,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 }
 
 func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
-	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' GROUP BY work_slug)", siteLang)
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
 	columns := []string{
 		"work.slug",
 		"authors.names",
@@ -377,7 +377,7 @@ func (db *DB) getEditionLinks(workSlug string, editionYear int) ([]Link, error) 
 
 func (db *DB) getTextsData() ([]Work, error) {
 	workData := []Work{}
-	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.lang = '%s' GROUP BY work_slug)", siteLang)
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
 	columns := []string{
 		"authors.names",
 		"INITCAP(eng_desc)",
@@ -388,7 +388,7 @@ func (db *DB) getTextsData() ([]Work, error) {
 	}
 	tables := []string{
 		"work",
-		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.lang = '%s'", siteLang),
+		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.site_lang = '%s'", siteLang),
 		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
 		"INNER JOIN lang ON work.lang = lang.three",
 		"INNER JOIN link_content ON link_content.work_slug = work.slug",
