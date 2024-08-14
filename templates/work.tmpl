@@ -1,6 +1,6 @@
 {{ header .TitleMain }}
             <hgroup>
-                <h1>{{ .TitleMain }}</h1>
+                <h1{{ if ne .LangCode "en" }} lang="{{ .LangCode }}"{{ end }}>{{ .TitleMain }}</h1>
                 <p id="attribution">by 
                 {{ range $index, $author := .Authors }}
                 {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}/">{{ .Name }}</a>
@@ -9,9 +9,9 @@
             </hgroup>
             <dl>
                 <dt>Full Title:</dt>
-                <dd>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
+                <dd{{ if ne .LangCode "en" }} lang="{{ .LangCode }}"{{ end }}>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
                 <dt>Original language:</dt>
-                <dd>{{ .Lang }}</dd>
+                <dd>{{ .LangDesc }}</dd>
                 {{ if not .Wikidata }}{{ else }}
                 <dt>Wikidata:</dt>
                 <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
@@ -27,11 +27,7 @@
                 <ul>
                     {{ range .Editions }}
                     <li>
-                    {{ if not .Translation }}
-                    <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Description }}</p>
-                    {{ else }}
-                    <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ .Translation }} - {{ .Description }}</p>
-                    {{ end }}
+                    <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ if .Translators }}{{ .LangDesc }} translation ({{ .Translators }}) - "{{ langCodeSpan .LangCode .Title }}" - {{ end }}{{ .Description }}</p>
                     {{ if .Links }}
                     <ul>
                         {{ range .Links }}
@@ -53,7 +49,7 @@
                 <ul>
                 {{ range .Translations }}
                 <li>
-                <p>{{ .Lang }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ end }}- "{{ .TitleMain }}"{{ if .Description }} - {{ .Description }}{{ end }}</p>
+                <p>{{ .LangDesc }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ end }}- "{{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}"{{ if .Description }} - {{ .Description }}{{ end }}</p>
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}

@@ -4,7 +4,9 @@
                 {{ range . }}
                 <li>
                     <a href="{{ domain }}/works/{{ .Slug }}/">
-                    {{ if .Year }}{{ .Year }} - {{ end }}{{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}{{ .TitleMain }}
+                    {{ if .Year }}{{ .Year }} - {{ end }}
+                    {{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}
+                    {{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}
                     </a>
                 </li>
                 {{ end }}

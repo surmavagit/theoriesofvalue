@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"html/template"
 	"image"
 	_ "image/jpeg"
@@ -10,10 +11,15 @@ import (
 )
 
 // default function map for templates
-var funcMap = template.FuncMap{"domain": getDomain, "header": header, "footer": footer, "getPortrait": getPortrait}
+var funcMap = template.FuncMap{"domain": getDomain, "langCodeSpan": langCodeSpan, "header": header, "footer": footer, "getPortrait": getPortrait}
 
 func getDomain() template.URL {
 	return template.URL(address)
+}
+
+func langCodeSpan(langCode string, textToEnclose string) template.HTML {
+	enclosed := fmt.Sprintf("<span lang=\"%s\">%s</span>", langCode, textToEnclose)
+	return template.HTML(enclosed)
 }
 
 func header(title string) (template.HTML, error) {

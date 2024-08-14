@@ -36,7 +36,8 @@ type Author struct {
 type Work struct {
 	Slug         string
 	Page         bool
-	Lang         string
+	LangCode     string
+	LangDesc     string
 	Year         *int
 	AllAuthors   *string
 	Authors      []Author
@@ -53,9 +54,11 @@ type Edition struct {
 	Slug        string
 	Year        int
 	Important   bool
-	Lang        string
+	LangCode    string
+	LangDesc    string
 	Description string
-	Translation *string
+	Translators *string
+	Title       string
 	Links       []Link
 }
 
@@ -63,7 +66,8 @@ type Translation struct {
 	Slug        string
 	AllAuthors  *string
 	Year        int
-	Lang        string
+	LangCode    string
+	LangDesc    string
 	TitleMain   string
 	Description string
 	Links       []Link
@@ -177,6 +181,7 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 	columns := []string{
 		"slug",
 		"page",
+		"COALESCE(lang.two, lang.three)",
 		"title.main_part",
 		db.selectFirstEditionYear(),
 	}
@@ -185,6 +190,7 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 		fmt.Sprintf("LEFT JOIN title ON work.slug = title.work_slug AND title.site_lang = '%s'", siteLang),
 		"LEFT JOIN attribution ON work.slug = attribution.work_slug",
 		fmt.Sprintf("LEFT JOIN name ON name.author = attribution.author_slug AND name.site_lang = '%s'", siteLang),
+		"LEFT JOIN lang ON work.lang = lang.three",
 	}
 	rest := fmt.Sprintf("WHERE name.author = '%s' ORDER BY year", authorSlug)
 	workRows, err := db.sqlQuery(columns, tables, rest)
@@ -196,7 +202,7 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 	authorWorks := []Work{}
 	for workRows.Next() {
 		a := Work{}
-		err := workRows.Scan(&a.Slug, &a.Page, &a.TitleMain, &a.Year)
+		err := workRows.Scan(&a.Slug, &a.Page, &a.LangCode, &a.TitleMain, &a.Year)
 		if err != nil {
 			return nil, err
 		}
@@ -211,6 +217,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
 	columns := []string{
 		"authors.names",
+		"COALESCE(lang.two, lang.three)",
 		"INITCAP(eng_desc)",
 		"slug",
 		"wikidata",
@@ -235,7 +242,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 
 	for workRows.Next() {
 		w := Work{}
-		err := workRows.Scan(&w.AllAuthors, &w.Lang, &w.Slug, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
+		err := workRows.Scan(&w.AllAuthors, &w.LangCode, &w.LangDesc, &w.Slug, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
 		if err != nil {
 			return nil, err
 		}
@@ -279,7 +286,10 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 		"work.slug",
 		"year",
 		"description",
-		fmt.Sprintf("CASE WHEN work.translation IS NOT NULL THEN CONCAT(INITCAP(lang.eng_desc), ' translation (', COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous'), '): \"', title.main_part, '\"') END", siteLang),
+		fmt.Sprintf("CASE WHEN work.translation IS NOT NULL THEN COALESCE((SELECT STRING_AGG(name.main_part, ', ') FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' WHERE attribution.work_slug = work.slug), 'anonymous') END", siteLang),
+		"title.main_part",
+		"COALESCE(lang.two, lang.three)",
+		"INITCAP(lang.eng_desc)",
 	}
 	tables := []string{
 		"edition",
@@ -297,7 +307,7 @@ func (db *DB) getWorkEditions(workSlug string) ([]Edition, error) {
 	editions := []Edition{}
 	for rows.Next() {
 		e := Edition{}
-		err := rows.Scan(&e.Slug, &e.Year, &e.Description, &e.Translation)
+		err := rows.Scan(&e.Slug, &e.Year, &e.Description, &e.Translators, &e.Title, &e.LangCode, &e.LangDesc)
 		if err != nil {
 			return nil, err
 		}
@@ -313,6 +323,7 @@ func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
 		"work.slug",
 		"authors.names",
 		"year",
+		"COALESCE(lang.two, lang.three)",
 		"INITCAP(lang.eng_desc)",
 		"title.main_part",
 		"description",
@@ -333,7 +344,7 @@ func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
 	translations := []Translation{}
 	for rows.Next() {
 		t := Translation{}
-		err := rows.Scan(&t.Slug, &t.AllAuthors, &t.Year, &t.Lang, &t.TitleMain, &t.Description)
+		err := rows.Scan(&t.Slug, &t.AllAuthors, &t.Year, &t.LangCode, &t.LangDesc, &t.TitleMain, &t.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -402,7 +413,7 @@ func (db *DB) getTextsData() ([]Work, error) {
 
 	for workRows.Next() {
 		w := Work{}
-		err := workRows.Scan(&w.AllAuthors, &w.Lang, &w.Slug, &w.TitleMain, &w.FullTitle, &w.Year)
+		err := workRows.Scan(&w.AllAuthors, &w.LangDesc, &w.Slug, &w.TitleMain, &w.FullTitle, &w.Year)
 		if err != nil {
 			return nil, err
 		}
