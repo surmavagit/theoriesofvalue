@@ -49,7 +49,7 @@
                 <ul>
                 {{ range .Translations }}
                 <li>
-                <p>{{ .LangDesc }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ end }}- "{{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}"{{ if .Description }} - {{ .Description }}{{ end }}</p>
+                <p>{{ .LangDesc }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- "{{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}"{{ if .Description }} - {{ .Description }}{{ end }}</p>
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}
