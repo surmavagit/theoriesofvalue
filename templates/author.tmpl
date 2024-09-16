@@ -23,7 +23,8 @@
                 <dd><a href="https://onlinebooks.library.upenn.edu/webbin/book/lookupname?key={{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
                 {{ end }}
             </dl>
-            {{ if not .Works }}{{ else }}
+            {{ getComment .Slug }}
+            {{ if .Works }}
             <section>
                 <h2>Works</h2>
                 <ul>

@@ -11,7 +11,7 @@ import (
 )
 
 // default function map for templates
-var funcMap = template.FuncMap{"domain": getDomain, "langCodeSpan": langCodeSpan, "header": header, "footer": footer, "getPortrait": getPortrait}
+var funcMap = template.FuncMap{"domain": getDomain, "langCodeSpan": langCodeSpan, "header": header, "footer": footer, "getPortrait": getPortrait, "getComment": getComment}
 
 func getDomain() template.URL {
 	return template.URL(address)
@@ -62,4 +62,12 @@ func getPortrait(slug string) (template.HTML, error) {
 	}
 	err = ptrtTmpl.Execute(&bfr, data)
 	return template.HTML(bfr.String()), err
+}
+
+func getComment(slug string) (template.HTML, error) {
+	comment, err := os.ReadFile("comments/" + slug + ".html")
+	if err != nil && errors.Is(err, os.ErrNotExist) {
+		return "", nil
+	}
+	return template.HTML(fmt.Sprintf("<section>\n%s</section>", comment)), err
 }
