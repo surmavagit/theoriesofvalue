@@ -1,10 +1,18 @@
 {{ header "Authors" }}
             <h1>Authors</h1>
-            <ul>
+            <label for="sort-select">Sort by:</label>
+            <select name="sort-fields" id="sort-select">
+            <option value="name" selected>Name</option>
+            <option value="birth">Birth</option>
+            <option value="death">Death</option>
+            </select>
+            <ul id="author-list">
                 {{ range . }}
-                <li><a href="{{ domain }}/authors/{{ .Slug }}/">
-                    {{ .Name }} ({{ if not .Birth }}?{{ else }}{{ .Birth }}{{ end }}-{{ if not .Death }}?{{ else }}{{ .Death }}{{ end }})
-                </a></li>
+                <li data-name="{{ .Slug }}" data-birth="{{ if not .Birth }}9999{{ else }}{{ .Birth }}{{ end }}" data-death="{{ if not .Death }}9999{{ else }}{{ .Death }}{{ end }}">
+                    <a href="{{ domain }}/authors/{{ .Slug }}/">
+                        {{ .Name }} ({{ if not .Birth }}?{{ else }}{{ .Birth }}{{ end }}-{{ if not .Death }}?{{ else }}{{ .Death }}{{ end }})
+                    </a>
+                </li>
                 {{ end }}
             </ul>
 {{ footer }}
