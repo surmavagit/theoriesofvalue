@@ -2,23 +2,23 @@
             <h1>{{ .Name }}</h1>
             {{ getPortrait .Slug }}
             <dl>
-                {{ if not .Birth }}{{ else }}
+                {{ if .Birth }}
                 <dt>Birth:</dt>
-                <dd>{{ .Birth }}</dd>
+                <dd>{{ fmtYear .Birth }}</dd>
                 {{ end }}
-                {{ if not .Death }}{{ else }}
+                {{ if .Death }}
                 <dt>Death:</dt>
-                <dd>{{ .Death }}</dd>
+                <dd>{{ fmtYear .Death }}</dd>
                 {{ end }}
-                {{ if not .Wikidata }}{{ else }}
+                {{ if .Wikidata }}
                 <dt>Wikidata:</dt>
                 <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
                 {{ end }}
-                {{ if not .Wikipedia }}{{ else }}
+                {{ if .Wikipedia }}
                 <dt>Wikipedia:</dt>
                 <dd><a href="https://{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
                 {{ end }}
-                {{ if not .OnlineBooks }}{{ else }}
+                {{ if .OnlineBooks }}
                 <dt>OnlineBooksPage:</dt>
                 <dd><a href="https://onlinebooks.library.upenn.edu/webbin/book/lookupname?key={{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
                 {{ end }}

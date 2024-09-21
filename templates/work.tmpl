@@ -12,11 +12,11 @@
                 <dd{{ if ne .LangCode "en" }} lang="{{ .LangCode }}"{{ end }}>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
                 <dt>Original language:</dt>
                 <dd>{{ .LangDesc }}</dd>
-                {{ if not .Wikidata }}{{ else }}
+                {{ if .Wikidata }}
                 <dt>Wikidata:</dt>
                 <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
                 {{ end }}
-                {{ if not .Wikipedia }}{{ else }}
+                {{ if .Wikipedia }}
                 <dt>Wikipedia:</dt>
                 <dd><a href="https://{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
                 {{ end }}
