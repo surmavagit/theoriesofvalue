@@ -3,9 +3,13 @@
             <ul>
                 {{ range . }}
                 <li>
+                    <span class="block">
+                        {{ if .Year }}{{ .Year }} - {{ end }}
+                        {{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}
+                        <span class="langcode">{{ .LangCode }}</span>
+                        {{ if .AllLangs }}{{ formatLangs .AllLangs }}{{ end }}
+                    </span>
                     <a href="{{ domain }}/works/{{ .Slug }}/">
-                    {{ if .Year }}{{ .Year }} - {{ end }}
-                    {{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}
                     {{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}
                     </a>
                 </li>

@@ -38,6 +38,7 @@ type Work struct {
 	Page         bool
 	LangCode     string
 	LangDesc     string
+	AllLangs     *string
 	Year         *int
 	AllAuthors   *string
 	Authors      []Author
@@ -215,11 +216,13 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 func (db *DB) getWorkData() ([]Work, error) {
 	workData := []Work{}
 	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
+	selectWorkAllTranslationsTable := "(SELECT orig.slug, STRING_AGG(DISTINCT lang.two, ',') AS translang FROM work AS orig LEFT JOIN work AS trsl ON orig.slug = trsl.translation LEFT JOIN lang ON trsl.lang = lang.three GROUP BY orig.slug HAVING orig.translation IS NULL)"
 	columns := []string{
 		"authors.names",
 		"COALESCE(lang.two, lang.three)",
 		"INITCAP(eng_desc)",
-		"slug",
+		"translang",
+		"work.slug",
 		"wikidata",
 		"CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END",
 		"title.main_part",
@@ -230,6 +233,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 		"work",
 		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.site_lang = '%s'", siteLang),
 		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
+		fmt.Sprintf("LEFT JOIN %s AS translangs ON work.slug = translangs.slug", selectWorkAllTranslationsTable),
 		fmt.Sprintf("LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
 		"INNER JOIN lang ON work.lang = lang.three",
 	}
@@ -242,7 +246,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 
 	for workRows.Next() {
 		w := Work{}
-		err := workRows.Scan(&w.AllAuthors, &w.LangCode, &w.LangDesc, &w.Slug, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
+		err := workRows.Scan(&w.AllAuthors, &w.LangCode, &w.LangDesc, &w.AllLangs, &w.Slug, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
 		if err != nil {
 			return nil, err
 		}

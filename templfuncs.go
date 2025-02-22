@@ -8,13 +8,22 @@ import (
 	"image"
 	_ "image/jpeg"
 	"os"
+	"strings"
 )
 
 // default function map for templates
-var funcMap = template.FuncMap{"domain": getDomain, "langCodeSpan": langCodeSpan, "header": header, "footer": footer, "getPortrait": getPortrait, "getComment": getComment, "fmtYear": fmtYear}
+var funcMap = template.FuncMap{"domain": getDomain, "langCodeSpan": langCodeSpan, "header": header, "footer": footer, "getPortrait": getPortrait, "getComment": getComment, "fmtYear": fmtYear, "formatLangs": formatLangs}
 
 func getDomain() template.URL {
 	return template.URL(address)
+}
+
+func formatLangs(allLangs string) template.HTML {
+	langArr := strings.Split(allLangs, ",")
+	for i, l := range langArr {
+		langArr[i] = fmt.Sprintf("<span class=\"langcode\">%s</span>", l)
+	}
+	return template.HTML(strings.Join(langArr, "\n"))
 }
 
 func langCodeSpan(langCode string, textToEnclose string) template.HTML {

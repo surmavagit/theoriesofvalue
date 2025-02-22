@@ -33,8 +33,14 @@
                     <ul>
                         {{ range .Links }}
                         <li>
-                            <span><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</span>
-                            {{ if .Description }}<span>{{ .Description }}</span>{{ end }}
+                        {{ if .Description }}
+                            <span class="block">
+                        {{ end }}
+                            <a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}
+                        {{ if .Description }}
+                            </span>
+                            <span class="block">{{ .Description }}</span>
+                        {{ end }}
                         </li>
                         {{ end }}
                     </ul>
@@ -55,8 +61,14 @@
                 <ul>
                     {{ range .Links }}
                     <li>
-                        <span><a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}</span>
-                        {{ if .Description }}<span>{{ .Description }}</span>{{ end }}
+                    {{ if .Description }}
+                        <span class="block">
+                    {{ end }}
+                            <a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}
+                    {{ if .Description }}
+                        </span>
+                        <span class="block">{{ .Description }}</span>
+                    {{ end }}
                     </li>
                     {{ end }}
                 </ul>
