@@ -2,16 +2,14 @@
             <h1>Works</h1>
             <ul>
                 {{ range . }}
-                <li>
-                    <span class="block">
-                        {{ if .Year }}{{ .Year }} - {{ end }}
-                        {{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}
-                        <span class="langcode">{{ .LangCode }}</span>
-                        {{ if .AllLangs }}{{ formatLangs .AllLangs }}{{ end }}
+                <li class="workentry">
+                    <span class="year">{{ if .Year }}{{ fmtYear .Year }}{{ end }}
+                    </span><b>{{ if .AllAuthors }}{{ .AllAuthors }}{{ else if .Dubious }}Anonymous{{ end }}</b>
+                    <span class="langcode">{{ .LangCode }}</span>
+                    {{ if .AllLangs }}{{ formatLangs .AllLangs }}{{ end }}
+                    <span{{ langAttribute .LangCode }}>
+                        <a href="{{ domain }}/works/{{ .Slug }}/">{{ .TitleMain }}</a>
                     </span>
-                    <a href="{{ domain }}/works/{{ .Slug }}/">
-                    {{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}
-                    </a>
                 </li>
                 {{ end }}
             </ul>

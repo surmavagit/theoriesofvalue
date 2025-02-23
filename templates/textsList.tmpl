@@ -2,10 +2,13 @@
             <h1>Read on Theories of Value</h1>
             <ul>
                 {{ range . }}
-                <li>
-                    <a href="{{ domain }}/read/{{ .Slug }}.html">
-                    {{ if .Year }}{{ .Year }} - {{ end }}{{ if .AllAuthors }}{{ .AllAuthors }} - {{ else if .Dubious }}Anonymous - {{ end }}{{ .TitleMain }}
-                    </a>
+                <li class="workentry">
+                    <span class="year">{{ if .Year }}{{ fmtYear .Year }}{{ end }}
+                    </span><b>{{ if .AllAuthors }}{{ .AllAuthors }}{{ else if .Dubious }}Anonymous{{ end }}</b>
+                    <span class="langcode">{{ .LangCode }}</span>
+                    <span{{ langAttribute .LangCode }}>
+                        <a href="{{ domain }}/read/{{ .Slug }}.html">{{ .TitleMain }}</a>
+                    </span>
                 </li>
                 {{ end }}
             </ul>

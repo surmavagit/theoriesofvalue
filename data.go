@@ -179,12 +179,16 @@ func (db *DB) getAuthorData() ([]Author, error) {
 }
 
 func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
+	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
+	selectWorkAllTranslationsTable := "(SELECT orig.slug, STRING_AGG(DISTINCT lang.two, ',') AS translang FROM work AS orig LEFT JOIN work AS trsl ON orig.slug = trsl.translation LEFT JOIN lang ON trsl.lang = lang.three GROUP BY orig.slug HAVING orig.translation IS NULL)"
 	columns := []string{
-		"slug",
+		"work.slug",
 		"page",
 		"COALESCE(lang.two, lang.three)",
+		"translang",
 		"title.main_part",
 		db.selectFirstEditionYear(),
+		"authors.names",
 	}
 	tables := []string{
 		"work",
@@ -192,6 +196,8 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 		"LEFT JOIN attribution ON work.slug = attribution.work_slug",
 		fmt.Sprintf("LEFT JOIN name ON name.author = attribution.author_slug AND name.site_lang = '%s'", siteLang),
 		"LEFT JOIN lang ON work.lang = lang.three",
+		fmt.Sprintf("LEFT JOIN %s AS translangs ON work.slug = translangs.slug", selectWorkAllTranslationsTable),
+		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
 	}
 	rest := fmt.Sprintf("WHERE name.author = '%s' ORDER BY year", authorSlug)
 	workRows, err := db.sqlQuery(columns, tables, rest)
@@ -203,7 +209,7 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 	authorWorks := []Work{}
 	for workRows.Next() {
 		a := Work{}
-		err := workRows.Scan(&a.Slug, &a.Page, &a.LangCode, &a.TitleMain, &a.Year)
+		err := workRows.Scan(&a.Slug, &a.Page, &a.LangCode, &a.AllLangs, &a.TitleMain, &a.Year, &a.AllAuthors)
 		if err != nil {
 			return nil, err
 		}
@@ -399,6 +405,7 @@ func (db *DB) getTextsData() ([]Work, error) {
 		"slug",
 		"title.main_part",
 		"CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END",
+		"lang.two",
 		db.selectFirstEditionYear(),
 	}
 	tables := []string{
@@ -417,7 +424,7 @@ func (db *DB) getTextsData() ([]Work, error) {
 
 	for workRows.Next() {
 		w := Work{}
-		err := workRows.Scan(&w.AllAuthors, &w.LangDesc, &w.Slug, &w.TitleMain, &w.FullTitle, &w.Year)
+		err := workRows.Scan(&w.AllAuthors, &w.LangDesc, &w.Slug, &w.TitleMain, &w.FullTitle, &w.LangCode, &w.Year)
 		if err != nil {
 			return nil, err
 		}

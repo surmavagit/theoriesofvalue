@@ -12,7 +12,16 @@ import (
 )
 
 // default function map for templates
-var funcMap = template.FuncMap{"domain": getDomain, "langCodeSpan": langCodeSpan, "header": header, "footer": footer, "getPortrait": getPortrait, "getComment": getComment, "fmtYear": fmtYear, "formatLangs": formatLangs}
+var funcMap = template.FuncMap{
+	"domain":        getDomain,
+	"langAttribute": langAttribute,
+	"header":        header,
+	"footer":        footer,
+	"getPortrait":   getPortrait,
+	"getComment":    getComment,
+	"fmtYear":       fmtYear,
+	"formatLangs":   formatLangs,
+}
 
 func getDomain() template.URL {
 	return template.URL(address)
@@ -26,12 +35,14 @@ func formatLangs(allLangs string) template.HTML {
 	return template.HTML(strings.Join(langArr, "\n"))
 }
 
-func langCodeSpan(langCode string, textToEnclose string) template.HTML {
+func langAttribute(langCode string) template.HTMLAttr {
+	if langCode == "en" {
+		return ""
+	}
 	if langCode == "grc" {
 		langCode = "grc-Latn"
 	}
-	enclosed := fmt.Sprintf("<span lang=\"%s\">%s</span>", langCode, textToEnclose)
-	return template.HTML(enclosed)
+	return template.HTMLAttr(fmt.Sprintf(" lang=\"%s\"", langCode))
 }
 
 func header(title string) (template.HTML, error) {

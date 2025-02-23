@@ -1,6 +1,6 @@
 {{ header .TitleMain }}
             <hgroup>
-                <h1{{ if ne .LangCode "en" }} lang="{{ .LangCode }}"{{ end }}>{{ .TitleMain }}</h1>
+                <h1{{ langAttribute .LangCode }}>{{ .TitleMain }}</h1>
                 <p id="attribution">by 
                 {{ range $index, $author := .Authors }}
                 {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}/">{{ .Name }}</a>
@@ -9,7 +9,7 @@
             </hgroup>
             <dl>
                 <dt>Full Title:</dt>
-                <dd{{ if ne .LangCode "en" }} lang="{{ .LangCode }}"{{ end }}>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
+                <dd{{ langAttribute .LangCode }}>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
                 <dt>Original language:</dt>
                 <dd>{{ .LangDesc }}</dd>
                 {{ if .Wikidata }}
@@ -28,7 +28,13 @@
                 <ul>
                     {{ range .Editions }}
                     <li>
-                    <p>{{ if .Year }}{{ .Year }} - {{ end}}{{ if .Translators }}{{ .LangDesc }} translation ({{ .Translators }}) - "{{ langCodeSpan .LangCode .Title }}" - {{ end }}{{ .Description }}</p>
+                    <p>{{ if .Year }}{{ .Year }} - {{ end}}
+                    {{ if .Translators }}
+                    {{ .LangDesc }} translation ({{ .Translators }}) - 
+                    {{ if ne .LangCode "en" }}
+                        <span{{ langAttribute .LangCode }}>{{ end }}"{{ .Title }}"{{ if ne .LangCode "en" }}</span>
+                    {{ end }} - {{ end }}
+                    {{ .Description }}</p>
                     {{ if .Links }}
                     <ul>
                         {{ range .Links }}
@@ -56,7 +62,7 @@
                 <ul>
                 {{ range .Translations }}
                 <li>
-                <p>{{ .LangDesc }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- "{{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}"{{ if .Description }} - {{ .Description }}{{ end }}</p>
+                <p>{{ .LangDesc }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- {{ if ne .LangCode "en" }}<span{{ langAttribute .LangCode }}>{{ end }}"{{ .TitleMain }}"{{ if ne .LangCode "en" }}</span>{{ end }}{{ if .Description }} - {{ .Description }}{{ end }}</p>
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}

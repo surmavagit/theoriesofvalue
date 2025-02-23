@@ -4,6 +4,8 @@ html {
     align-items: center;
     line-height: 1.6;
     font-family: sans;
+
+    --year-width: 7ch;
 }
 
 body {
@@ -12,6 +14,7 @@ body {
 
 ul {
     padding: 0;
+    list-style-type: none;
 }
 
 li > ul {
@@ -41,6 +44,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .block {
     display: block;
+}
+
+.year {
+    display: inline-block;
+    min-width: var(--year-width);
+}
+
+.workentry > span:last-child {
+    display: block;
+    margin-inline-start: var(--year-width);
 }
 
 .langcode {

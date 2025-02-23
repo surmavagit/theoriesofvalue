@@ -29,10 +29,16 @@
                 <h2>Works</h2>
                 <ul>
                     {{ range .Works }}
-                    <li>
-                    {{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}/">{{ end }}
-                    {{ if .Year }}{{ .Year }} - {{ end }} {{ if ne .LangCode "en" }}{{ langCodeSpan .LangCode .TitleMain }}{{ else }}{{ .TitleMain }}{{ end }}
-                    {{ if .Page }}</a>{{ end }}
+                    <li class="workentry">
+                    <span class="year">{{ if .Year }}{{ fmtYear .Year }}{{ end }}
+                    </span><b>{{ .AllAuthors }}</b>
+                    <span class="langcode">{{ .LangCode }}</span>
+                    {{ if .AllLangs }}{{ formatLangs .AllLangs }}{{ end }}
+                    <span{{ langAttribute .LangCode }}>
+                        {{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}/">{{ end }}
+                        {{ .TitleMain }}
+                        {{ if .Page }}</a>{{ end }}
+                    </span>
                     </li>
                     {{ end }}
                 </ul>
