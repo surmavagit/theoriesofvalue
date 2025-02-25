@@ -28,7 +28,7 @@
                 <ul>
                     {{ range .Editions }}
                     <li>
-                    <p>{{ if .Year }}{{ .Year }} - {{ end}}
+                    <p>{{ if .Year }}{{ fmtYear .Year }} - {{ end}}
                     {{ if .Translators }}
                     {{ .LangDesc }} translation ({{ .Translators }}) - 
                     {{ if ne .LangCode "en" }}
@@ -62,7 +62,7 @@
                 <ul>
                 {{ range .Translations }}
                 <li>
-                <p>{{ .LangDesc }} - {{ if .Year }}{{ .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- {{ if ne .LangCode "en" }}<span{{ langAttribute .LangCode }}>{{ end }}"{{ .TitleMain }}"{{ if ne .LangCode "en" }}</span>{{ end }}{{ if .Description }} - {{ .Description }}{{ end }}</p>
+                <p>{{ .LangDesc }} - {{ if .Year }}{{ fmtYear .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- {{ if ne .LangCode "en" }}<span{{ langAttribute .LangCode }}>{{ end }}"{{ .TitleMain }}"{{ if ne .LangCode "en" }}</span>{{ end }}{{ if .Description }} - {{ .Description }}{{ end }}</p>
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}
