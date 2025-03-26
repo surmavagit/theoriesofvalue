@@ -345,7 +345,8 @@ func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
 		"INNER JOIN lang ON lang.three = work.lang",
 		"INNER JOIN title ON title.work_slug = work.slug",
 	}
-	rows, err := db.sqlQuery(columns, tables, "ORDER BY year")
+	rest := fmt.Sprintf("WHERE title.site_lang = '%s' ORDER BY year", siteLang)
+	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err
 	}
