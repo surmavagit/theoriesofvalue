@@ -39,8 +39,8 @@ func langAttribute(langCode string) template.HTMLAttr {
 	if langCode == "en" {
 		return ""
 	}
-	if langCode == "grc" {
-		langCode = "grc-Latn"
+	if langCode == "grc" || langCode == "ru" {
+		langCode += "-Latn"
 	}
 	return template.HTMLAttr(fmt.Sprintf(" lang=\"%s\"", langCode))
 }
