@@ -7,6 +7,7 @@
                 {{ end }}
                 </p>
             </hgroup>
+                {{ getPortrait .Slug }}
             <dl>
                 <dt>Full Title:</dt>
                 <dd{{ langAttribute .LangCode }}>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>
