@@ -17,18 +17,20 @@ ul {
     list-style-type: none;
 }
 
-li > ul {
+li>ul {
     padding-inline-start: 3ch;
 }
 
-header, footer, nav > ul {
+header,
+footer,
+nav>ul {
     display: flex;
     justify-content: space-between;
     column-gap: 1ch;
     align-items: center;
 }
 
-nav > ul {
+nav>ul {
     justify-content: space-around;
     list-style-type: none;
 }
@@ -37,7 +39,12 @@ li {
     margin-block: 1ex;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     text-align: center;
     font-family: serif;
 }
@@ -51,7 +58,7 @@ h1, h2, h3, h4, h5, h6 {
     min-width: var(--year-width);
 }
 
-.workentry > span:last-child {
+.workentry>span:last-child {
     display: block;
     margin-inline-start: var(--year-width);
 }
@@ -86,7 +93,7 @@ h1, h2, h3, h4, h5, h6 {
     height: 1px;
     width: 1px;
     overflow: hidden;
-    clip: rect(1px,1px,1px,1px);
+    clip: rect(1px, 1px, 1px, 1px);
     position: absolute;
     background-color: white;
 }
