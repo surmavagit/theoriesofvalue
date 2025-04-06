@@ -1,13 +1,13 @@
 {{ header .TitleMain }}
-            <hgroup>
+            <header>
                 <h1{{ langAttribute .LangCode }}>{{ .TitleMain }}</h1>
-                <p id="attribution">by 
+                <p id="sub-title">by 
                 {{ range $index, $author := .Authors }}
                 {{ if $index }},{{ end }} <a href="{{ domain }}/authors/{{ .Slug }}/">{{ .Name }}</a>
                 {{ end }}
                 </p>
-            </hgroup>
                 {{ getPortrait .Slug }}
+            </header>
             <dl>
                 <dt>Full Title:</dt>
                 <dd{{ langAttribute .LangCode }}>{{ if .FullTitle }}{{ .FullTitle }}{{ else }}{{ .TitleMain }}{{ end }}</dd>

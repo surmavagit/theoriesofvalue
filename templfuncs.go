@@ -92,7 +92,7 @@ func getComment(slug string) (template.HTML, error) {
 	if err != nil && errors.Is(err, os.ErrNotExist) {
 		return "", nil
 	}
-	return template.HTML(fmt.Sprintf("<section>\n%s</section>", comment)), err
+	return template.HTML(comment), err
 }
 
 func fmtYear(year int) template.HTML {

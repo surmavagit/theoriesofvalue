@@ -1,29 +1,11 @@
 {{ header .Name }}
+            <header>
             <h1>{{ .Name }}</h1>
+            <p id="sub-title">{{ if .Birth }}{{ fmtYear .Birth }}{{ else }}?{{ end }} - {{ if .Death }}{{ fmtYear .Death }}{{ else }}?{{ end }}</p>
             {{ getPortrait .Slug }}
-            <dl>
-                {{ if .Birth }}
-                <dt>Birth:</dt>
-                <dd>{{ fmtYear .Birth }}</dd>
-                {{ end }}
-                {{ if .Death }}
-                <dt>Death:</dt>
-                <dd>{{ fmtYear .Death }}</dd>
-                {{ end }}
-                {{ if .Wikidata }}
-                <dt>Wikidata:</dt>
-                <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
-                {{ end }}
-                {{ if .Wikipedia }}
-                <dt>Wikipedia:</dt>
-                <dd><a href="https://{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
-                {{ end }}
-                {{ if .OnlineBooks }}
-                <dt>OnlineBooksPage:</dt>
-                <dd><a href="https://onlinebooks.library.upenn.edu/webbin/book/lookupname?key={{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
-                {{ end }}
-            </dl>
+            </header>
             {{ getComment .Slug }}
+            <aside>
             {{ if .Works }}
             <section>
                 <h2>Works</h2>
@@ -44,4 +26,22 @@
                 </ul>
             </section>
             {{ end }}
+            <section>
+            <h2>Resources</h2>
+            <dl>
+                {{ if .Wikidata }}
+                <dt>Wikidata:</dt>
+                <dd><a href="https://wikidata.org/wiki/{{ .Wikidata }}">{{ .Wikidata }}</a></dd>
+                {{ end }}
+                {{ if .Wikipedia }}
+                <dt>Wikipedia:</dt>
+                <dd><a href="https://{{ .Wikipedia }}">{{ .Wikipedia }}</a></dd>
+                {{ end }}
+                {{ if .OnlineBooks }}
+                <dt>OnlineBooksPage:</dt>
+                <dd><a href="https://onlinebooks.library.upenn.edu/webbin/book/lookupname?key={{ .OnlineBooks }}">{{ .OnlineBooks }}</a></dd>
+                {{ end }}
+            </dl>
+            </section>
+            </aside>
 {{ footer }}
