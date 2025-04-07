@@ -58,7 +58,7 @@ h6 {
     min-width: var(--year-width);
 }
 
-.workentry>span:last-child {
+#worklist span:last-child {
     display: block;
     margin-inline-start: var(--year-width);
 }

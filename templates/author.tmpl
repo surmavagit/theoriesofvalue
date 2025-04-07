@@ -1,17 +1,19 @@
 {{ header .Name }}
+            <main id="main">
             <header>
             <h1>{{ .Name }}</h1>
             <p id="sub-title">{{ if .Birth }}{{ fmtYear .Birth }}{{ else }}?{{ end }} - {{ if .Death }}{{ fmtYear .Death }}{{ else }}?{{ end }}</p>
             {{ getPortrait .Slug }}
             </header>
             {{ getComment .Slug }}
+            </main>
             <aside>
             {{ if .Works }}
-            <section>
+            <section id="works">
                 <h2>Works</h2>
-                <ul>
+                <ul id="worklist">
                     {{ range .Works }}
-                    <li class="workentry">
+                    <li>
                     <span class="year">{{ if .Year }}{{ fmtYear .Year }}{{ end }}
                     </span><b>{{ .AllAuthors }}</b>
                     <span class="langcode">{{ .LangCode }}</span>
@@ -26,7 +28,7 @@
                 </ul>
             </section>
             {{ end }}
-            <section>
+            <section id="resources">
             <h2>Resources</h2>
             <dl>
                 {{ if .Wikidata }}

@@ -1,4 +1,5 @@
 {{ header .TitleMain }}
+            <main id="main">
             <header>
                 <h1{{ langAttribute .LangCode }}>{{ .TitleMain }}</h1>
                 <p id="sub-title">by 
@@ -23,8 +24,10 @@
                 {{ end }}
             </dl>
             {{ getComment .Slug }}
+            </main>
+            <aside>
             {{ if .Editions }}
-            <section>
+            <section id="editions">
                 <h2>Editions</h2>
                 <ul>
                     {{ range .Editions }}
@@ -58,7 +61,7 @@
             </section>
             {{ end }}
             {{ if .Translations }}
-            <section>
+            <section id="translations">
                 <h2>Translations</h2>
                 <ul>
                 {{ range .Translations }}
@@ -85,4 +88,5 @@
                 </ul>
             </section>
             {{ end }}
+            </aside>
 {{ footer }}

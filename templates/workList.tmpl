@@ -1,8 +1,9 @@
 {{ header "Works" }}
+            <main id="main">
             <h1>Works</h1>
-            <ul>
+            <ul id="worklist">
                 {{ range . }}
-                <li class="workentry">
+                <li>
                     <span class="year">{{ if .Year }}{{ fmtYear .Year }}{{ end }}
                     </span><b>{{ if .AllAuthors }}{{ .AllAuthors }}{{ else if .Dubious }}Anonymous{{ end }}</b>
                     <span class="langcode">{{ .LangCode }}</span>
@@ -13,4 +14,5 @@
                 </li>
                 {{ end }}
             </ul>
+            </main>
 {{ footer }}
