@@ -182,8 +182,8 @@ func (db *DB) getAuthorWorks(authorSlug string) ([]Work, error) {
 	selectWorkAllAuthorsTable := fmt.Sprintf("(SELECT work_slug, STRING_AGG(name.main_part, ', ') AS names FROM attribution INNER JOIN name ON attribution.author_slug = name.author AND name.site_lang = '%s' GROUP BY work_slug)", siteLang)
 	selectWorkAllTranslationsTable := "(SELECT orig.slug, STRING_AGG(DISTINCT lang.two, ',') AS translang FROM work AS orig LEFT JOIN work AS trsl ON orig.slug = trsl.translation LEFT JOIN lang ON trsl.lang = lang.three GROUP BY orig.slug HAVING orig.translation IS NULL)"
 	columns := []string{
-		"work.slug",
-		"page",
+		"COALESCE(work.translation, work.slug)",
+		"(CASE WHEN work.translation IS NOT NULL THEN true ELSE page END)",
 		"COALESCE(lang.two, lang.three)",
 		"translang",
 		"title.main_part",
@@ -345,7 +345,7 @@ func (db *DB) getWorkTranslations(workSlug string) ([]Translation, error) {
 		"INNER JOIN lang ON lang.three = work.lang",
 		"INNER JOIN title ON title.work_slug = work.slug",
 	}
-	rest := fmt.Sprintf("WHERE title.site_lang = '%s' ORDER BY year", siteLang)
+	rest := fmt.Sprintf("WHERE title.site_lang = '%s' ORDER BY lang, year", siteLang)
 	rows, err := db.sqlQuery(columns, tables, rest)
 	if err != nil {
 		return nil, err

@@ -63,10 +63,16 @@
             {{ if .Translations }}
             <section id="translations">
                 <h2>Translations</h2>
-                <ul>
+                {{ $langroup := "" }}
                 {{ range .Translations }}
+                {{ if ne .LangDesc $langroup }}
+                    {{ if ne $langroup "" }}</ul>{{ end }}
+                    <h3>{{ .LangDesc }}</h3>
+                    <ul>
+                    {{ $langroup = .LangDesc }}
+                {{ end }}
                 <li>
-                <p>{{ .LangDesc }} - {{ if .Year }}{{ fmtYear .Year }} {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- {{ if ne .LangCode "en" }}<span{{ langAttribute .LangCode }}>{{ end }}"{{ .TitleMain }}"{{ if ne .LangCode "en" }}</span>{{ end }}{{ if .Description }} - {{ .Description }}{{ end }}</p>
+                <p>{{ if .Year }}{{ fmtYear .Year }} - {{ end}}{{ if .AllAuthors }}({{ .AllAuthors }}) {{ else }}(Anonymous) {{ end }}- {{ if ne .LangCode "en" }}<span{{ langAttribute .LangCode }}>{{ end }}"{{ .TitleMain }}"{{ if ne .LangCode "en" }}</span>{{ end }}{{ if .Description }} - {{ .Description }}{{ end }}</p>
                 {{ if .Links }}
                 <ul>
                     {{ range .Links }}
