@@ -58,6 +58,14 @@ h6 {
     min-width: var(--year-width);
 }
 
+.textbox {
+    background-color: hsl(0 0 90);
+    padding-inline: 3ch;
+    padding-block: 1ch;
+    margin: 3ch;
+    font-style: italic;
+}
+
 #worklist span:last-child {
     display: block;
     margin-inline-start: var(--year-width);
