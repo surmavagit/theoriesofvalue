@@ -251,7 +251,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 	defer workRows.Close()
 
 	for workRows.Next() {
-		w := Work{}
+		w := Work{Page: true}
 		err := workRows.Scan(&w.AllAuthors, &w.LangCode, &w.LangDesc, &w.AllLangs, &w.Slug, &w.Wikidata, &w.Wikipedia, &w.TitleMain, &w.FullTitle, &w.Year)
 		if err != nil {
 			return nil, err

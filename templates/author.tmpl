@@ -13,17 +13,7 @@
                 <h2>Works</h2>
                 <ul id="worklist">
                     {{ range .Works }}
-                    <li>
-                    <span class="year">{{ if .Year }}{{ fmtYear .Year }}{{ end }}
-                    </span><b>{{ .AllAuthors }}</b>
-                    <span class="langcode">{{ .LangCode }}</span>
-                    {{ if .AllLangs }}{{ formatLangs .AllLangs }}{{ end }}
-                    <span{{ langAttribute .LangCode }}>
-                        {{ if .Page }}<a href="{{ domain }}/works/{{ .Slug }}/">{{ end }}
-                        {{ .TitleMain }}
-                        {{ if .Page }}</a>{{ end }}
-                    </span>
-                    </li>
+                    {{ workEntry . }}
                     {{ end }}
                 </ul>
             </section>

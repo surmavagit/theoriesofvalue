@@ -16,12 +16,12 @@ var funcMap = template.FuncMap{
 	"domain":        getDomain,
 	"langAttribute": langAttribute,
 	"linkEntry":     linkEntry,
+	"workEntry":     workEntry,
 	"header":        header,
 	"footer":        footer,
 	"getPortrait":   getPortrait,
 	"getComment":    getComment,
 	"fmtYear":       fmtYear,
-	"formatLangs":   formatLangs,
 }
 
 func getDomain() template.URL {
@@ -50,6 +50,14 @@ func linkEntry(data Link) (template.HTML, error) {
 	linkTmpl := template.Must(template.New("linkEntry.tmpl").ParseFiles(path(templatesDir, partialsDir, "linkEntry.tmpl")))
 	bfr := bytes.Buffer{}
 	err := linkTmpl.Execute(&bfr, data)
+	return template.HTML(bfr.String()), err
+}
+
+func workEntry(data Work) (template.HTML, error) {
+	funcMap := template.FuncMap{"fmtYear": fmtYear, "formatLangs": formatLangs, "langAttribute": langAttribute, "domain": getDomain}
+	workTmpl := template.Must(template.New("workEntry.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, partialsDir, "workEntry.tmpl")))
+	bfr := bytes.Buffer{}
+	err := workTmpl.Execute(&bfr, data)
 	return template.HTML(bfr.String()), err
 }
 
