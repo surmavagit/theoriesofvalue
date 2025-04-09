@@ -15,6 +15,7 @@ import (
 var funcMap = template.FuncMap{
 	"domain":        getDomain,
 	"langAttribute": langAttribute,
+	"linkEntry":     linkEntry,
 	"header":        header,
 	"footer":        footer,
 	"getPortrait":   getPortrait,
@@ -43,6 +44,13 @@ func langAttribute(langCode string) template.HTMLAttr {
 		langCode += "-Latn"
 	}
 	return template.HTMLAttr(fmt.Sprintf(" lang=\"%s\"", langCode))
+}
+
+func linkEntry(data Link) (template.HTML, error) {
+	linkTmpl := template.Must(template.New("linkEntry.tmpl").ParseFiles(path(templatesDir, partialsDir, "linkEntry.tmpl")))
+	bfr := bytes.Buffer{}
+	err := linkTmpl.Execute(&bfr, data)
+	return template.HTML(bfr.String()), err
 }
 
 func header(title string) (template.HTML, error) {

@@ -1,0 +1,10 @@
+<li>
+{{ if .Description }}
+    <span class="block">
+{{ end }}
+        <a href="{{ .Url }}">{{ .Website }}</a> - {{ if .Download }}downloadable {{ end }}{{ .Quality }}
+{{ if .Description }}
+    </span>
+    <span class="block">{{ .Description }}</span>
+{{ end }}
+</li>
