@@ -14,6 +14,7 @@ const (
 	outputDir    = "public"
 	staticDir    = "static"
 	templatesDir = "templates"
+	partialsDir  = "partials"
 	authorsDir   = "authors"
 	worksDir     = "works"
 	textsDir     = "read"

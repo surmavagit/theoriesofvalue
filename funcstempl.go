@@ -47,14 +47,14 @@ func langAttribute(langCode string) template.HTMLAttr {
 
 func header(title string) (template.HTML, error) {
 	funcMap := template.FuncMap{"domain": getDomain}
-	hdrTmpl := template.Must(template.New("header.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, "header.tmpl")))
+	hdrTmpl := template.Must(template.New("header.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, partialsDir, "header.tmpl")))
 	bfr := bytes.Buffer{}
 	err := hdrTmpl.Execute(&bfr, title)
 	return template.HTML(bfr.String()), err
 }
 
 func footer() (template.HTML, error) {
-	ftr, err := os.ReadFile(path(templatesDir, "footer.html"))
+	ftr, err := os.ReadFile(path(templatesDir, partialsDir, "footer.html"))
 	return template.HTML(ftr), err
 }
 
@@ -72,7 +72,7 @@ func getPortrait(slug string) (template.HTML, error) {
 		return "", err
 	}
 	funcMap := template.FuncMap{"domain": getDomain}
-	ptrtTmpl := template.Must(template.New("portrait.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, "portrait.tmpl")))
+	ptrtTmpl := template.Must(template.New("portrait.tmpl").Funcs(funcMap).ParseFiles(path(templatesDir, partialsDir, "portrait.tmpl")))
 	bfr := bytes.Buffer{}
 	data := struct {
 		Path   string
