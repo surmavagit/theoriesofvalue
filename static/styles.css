@@ -85,8 +85,9 @@ h6 {
 
 #author-list .authorname {
     display: inline-block;
-    max-inline-size: max(calc(100% - 18ch), 7ch);
-    /* 18ch - the year columns, 7ch - the longest name */
+    min-inline-size: 8ch;
+    max-inline-size: calc(100% - 18ch);
+    /* 18ch - the year columns */
 }
 
 .langcode {
