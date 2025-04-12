@@ -10,9 +10,9 @@
             <ul id="author-list">
                 {{ range . }}
                 <li data-name="{{ .Slug }}" data-birth="{{ if .Birth }}{{ .Birth }}{{ else }}9999{{ end }}" data-death="{{ if .Death }}{{ .Death }}{{ else }}9999{{ end }}">
-                    <a href="{{ domain }}/authors/{{ .Slug }}/">
-                        {{ .Name }} ({{ if .Birth }}{{ fmtYear .Birth }}{{ else }}?{{ end }} - {{ if .Death }}{{ fmtYear .Death }}{{ else }}?{{ end }})
-                    </a>
+                    <a href="{{ domain }}/authors/{{ .Slug }}/" class="authorname">{{ .Name }}</a>
+                    <span class="year">{{ if .Birth }}{{ fmtYear .Birth }}{{ else }}?{{ end }}</span>
+                    <span class="year">{{ if .Death }}{{ fmtYear .Death }}{{ else }}?{{ end }}</span>
                 </li>
                 {{ end }}
             </ul>
