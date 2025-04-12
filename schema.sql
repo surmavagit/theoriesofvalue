@@ -6,15 +6,10 @@ CREATE TABLE lang(
 
 CREATE TABLE wikidata(
     id varchar(10) PRIMARY KEY,
-    commons varchar(60) UNIQUE
-);
-
-CREATE TABLE wikipedia(
-    id varchar(10) REFERENCES wikidata(id),
-    site_lang char(3) REFERENCES lang(three),
-    lang_pedia char(2) REFERENCES lang(two),
-    slug_pedia varchar(60),
-    PRIMARY KEY(id, site_lang)
+    commons varchar(60) UNIQUE,
+    eng_lang char(2) REFERENCES lang(two),
+    eng_slug varchar(60),
+    CHECK (eng_lang IS NOT NULL AND eng_slug IS NOT NULL OR eng_lang IS NULL AND eng_slug IS NULL)
 );
 
 INSERT INTO lang VALUES

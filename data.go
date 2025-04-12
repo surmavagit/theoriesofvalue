@@ -150,13 +150,13 @@ func (db *DB) getAuthorData() ([]Author, error) {
 		"death",
 		"CONCAT_WS(' ', first_part, main_part, last_part) AS fullname",
 		"wikidata",
-		"CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia", "'.wikipedia.org/wiki/'", "slug_pedia) END",
+		"CASE WHEN eng_slug IS NOT NULL THEN CONCAT(eng_lang, '.wikipedia.org/wiki/', eng_slug) END",
 		"onlinebooks",
 	}
 	tables := []string{
 		"author",
 		fmt.Sprintf("INNER JOIN name ON author.slug = name.author AND name.site_lang = '%s'", siteLang),
-		fmt.Sprintf("LEFT JOIN wikipedia ON author.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN wikidata ON author.wikidata = wikidata.id"),
 	}
 	rest := "WHERE page = true ORDER BY main_part"
 	authorRows, err := db.sqlQuery(columns, tables, rest)
@@ -230,7 +230,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 		"translang",
 		"work.slug",
 		"wikidata",
-		"CASE WHEN slug_pedia IS NOT NULL THEN CONCAT(lang_pedia, '.wikipedia.org/wiki/', slug_pedia) END",
+		"CASE WHEN eng_slug IS NOT NULL THEN CONCAT(eng_lang, '.wikipedia.org/wiki/', eng_slug) END",
 		"title.main_part",
 		"CASE WHEN title.first_part IS NOT NULL or title.last_part IS NOT NULL THEN CONCAT(title.first_part, title.main_part, title.last_part) END",
 		db.selectFirstEditionYear(),
@@ -240,7 +240,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.site_lang = '%s'", siteLang),
 		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
 		fmt.Sprintf("LEFT JOIN %s AS translangs ON work.slug = translangs.slug", selectWorkAllTranslationsTable),
-		fmt.Sprintf("LEFT JOIN wikipedia ON work.wikidata = wikipedia.id AND wikipedia.site_lang = '%s'", siteLang),
+		fmt.Sprintf("LEFT JOIN wikidata ON work.wikidata = wikidata.id"),
 		"INNER JOIN lang ON work.lang = lang.three",
 	}
 	rest := "WHERE page = true ORDER BY year"
