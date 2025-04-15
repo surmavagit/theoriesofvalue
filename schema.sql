@@ -12,16 +12,6 @@ CREATE TABLE wikidata(
     CHECK (eng_lang IS NOT NULL AND eng_slug IS NOT NULL OR eng_lang IS NULL AND eng_slug IS NULL)
 );
 
-INSERT INTO lang VALUES
-('eng', 'en', 'english'),
-('fra', 'fr', 'french'),
-('deu', 'de', 'german'),
-('ita', 'it', 'italian'),
-('rus', 'ru', 'russian'),
-('spa', 'es', 'spanish'),
-('lat', 'la', 'latin'),
-('grc', NULL, 'ancient greek');
-
 CREATE TABLE author(
     slug varchar(20) PRIMARY KEY CONSTRAINT lowercase_or_minus CHECK (slug ~ '[a-z-]'),
     page bool NOT NULL,
@@ -76,11 +66,6 @@ CREATE TABLE edition(
 CREATE TABLE quality(
     quality varchar(20) PRIMARY KEY
 );
-
-INSERT INTO quality VALUES
-('page scans'),
-('unformatted text'),
-('formatted text');
 
 CREATE TABLE website(
     sitename varchar(20) PRIMARY KEY,
