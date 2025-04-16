@@ -5,6 +5,8 @@ html {
     line-height: 1.6;
     font-family: sans;
 
+    --border-color: hsl(0 0 90);
+
     --year-width: 7ch;
 }
 
@@ -30,13 +32,35 @@ nav>ul {
     align-items: center;
 }
 
+body>nav {
+    border-block-end: solid var(--border-color);
+    margin-block-end: 1lh;
+}
+
+body>footer {
+    border-block-start: solid var(--border-color);
+    margin-block-start: 1lh;
+}
+
+article {
+    margin-block-start: 1lh;
+    border-block-start: solid var(--border-color);
+    padding-block-start: 1lh;
+}
+
+time {
+    display: block;
+    text-align: right;
+}
+
 nav>ul {
     justify-content: space-around;
     list-style-type: none;
 }
 
-li {
-    margin-block: 1ex;
+li,
+dd {
+    margin-block-end: 1ex;
 }
 
 h1,
