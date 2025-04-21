@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# the formatting checks should only check the code being committed
+git stash --include-untracked --keep-index --quiet
+FMTCHECK=$(gofmt -l .)
+git stash pop --quiet
+
+if [ -n "$FMTCHECK" ]
+then
+    echo "golang formatting error"
+    exit 1
+fi
