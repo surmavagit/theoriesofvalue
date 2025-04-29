@@ -81,6 +81,18 @@ func mainReturnWithCode() int {
 		address = lpath + port
 	}
 
+	// output directory shouldn't exist, os.Stat should error
+	_, err = os.Stat(outputDir)
+	if err == nil {
+		fmt.Fprintf(os.Stderr, "public directory already exists")
+		return 1
+	}
+	err = os.Mkdir(outputDir, 0755)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "can't create public directory: %s", err)
+		return 1
+	}
+
 	// copy static files
 	staticFiles, err := os.ReadDir(staticDir)
 	if err != nil {
@@ -88,7 +100,7 @@ func mainReturnWithCode() int {
 		return 1
 	}
 	for _, sf := range staticFiles {
-		if sf.IsDir() {
+		if sf.IsDir() || !sf.Type().IsRegular() { // check for symlinks
 			continue
 		}
 		err := os.Link(path(staticDir, sf.Name()), path(outputDir, sf.Name()))

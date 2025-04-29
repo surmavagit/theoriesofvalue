@@ -156,7 +156,7 @@ func (db *DB) getAuthorData() ([]Author, error) {
 	tables := []string{
 		"author",
 		fmt.Sprintf("INNER JOIN name ON author.slug = name.author AND name.site_lang = '%s'", siteLang),
-		fmt.Sprintf("LEFT JOIN wikidata ON author.wikidata = wikidata.id"),
+		"LEFT JOIN wikidata ON author.wikidata = wikidata.id",
 	}
 	rest := "WHERE page = true ORDER BY main_part"
 	authorRows, err := db.sqlQuery(columns, tables, rest)
@@ -240,7 +240,7 @@ func (db *DB) getWorkData() ([]Work, error) {
 		fmt.Sprintf("INNER JOIN title ON title.work_slug = work.slug AND title.site_lang = '%s'", siteLang),
 		fmt.Sprintf("LEFT JOIN %s AS authors ON work.slug = authors.work_slug", selectWorkAllAuthorsTable),
 		fmt.Sprintf("LEFT JOIN %s AS translangs ON work.slug = translangs.slug", selectWorkAllTranslationsTable),
-		fmt.Sprintf("LEFT JOIN wikidata ON work.wikidata = wikidata.id"),
+		"LEFT JOIN wikidata ON work.wikidata = wikidata.id",
 		"INNER JOIN lang ON work.lang = lang.three",
 	}
 	rest := "WHERE page = true ORDER BY year"
