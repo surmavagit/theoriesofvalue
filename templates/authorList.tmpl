@@ -1,12 +1,15 @@
 {{ header "Authors" }}
             <main id="main">
             <h1>Authors</h1>
-            <label for="sort-select">Sort by:</label>
-            <select name="sort-fields" id="sort-select">
-            <option value="name" selected>Name</option>
-            <option value="birth">Birth</option>
-            <option value="death">Death</option>
-            </select>
+            <fieldset>
+            <legend>Sort by:</legend>
+            <input id="sr1" type="radio" name="sort-radio" value="name" checked />
+            <label for="sr1">Name</label>
+            <input id="sr2" type="radio" name="sort-radio" value="birth" />
+            <label for="sr2">Birth</label>
+            <input id="sr3" type="radio" name="sort-radio" value="death" />
+            <label for="sr3">Death</label>
+            </fieldset>
             <ul id="author-list">
                 {{ range . }}
                 <li data-name="{{ .Slug }}" data-birth="{{ if .Birth }}{{ .Birth }}{{ else }}9999{{ end }}" data-death="{{ if .Death }}{{ .Death }}{{ else }}9999{{ end }}">

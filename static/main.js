@@ -1,9 +1,13 @@
-const sortOptions = document.getElementById("sort-select");
-if (sortOptions) {
-    sortOptions.addEventListener("change", sortBy);
+const radios = document.getElementsByName("sort-radio");
 
-    function sortBy() {
-        const field = sortOptions.value;
+if (radios.length > 1) {
+    radios.forEach(radio => radio.addEventListener("change",
+        function() {
+            sortBy(radio.getAttribute("value"));
+        }
+    ));
+
+    function sortBy(field) {
         const list = document.getElementById('author-list');
 
         function compareFields(a, b) {
